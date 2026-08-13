@@ -17,7 +17,7 @@ export default function Loading() {
         top: 0,
         left: 0,
       }}>
-      <ReactLoading type="spin" color="#A593E0" />
+      <ReactLoading type="spin" color="#1A120B" />
     </Box>
   );
 }

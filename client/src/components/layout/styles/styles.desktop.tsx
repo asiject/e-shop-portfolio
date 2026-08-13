@@ -1,4 +1,4 @@
-const primaryColor = "#9ac66d";
+const primaryColor = "#1A120B";
 // const primaryColor = "#f9c1ca";
 export default {
   //GNB
@@ -36,7 +36,7 @@ export default {
     paddingLeft: 0,
     width: "100%",
     li: {
-      borderBottom: "2px solid palegreen",
+      borderBottom: "2px solid #1A120B",
       margin: "0 2px",
     },
   },
@@ -129,9 +129,11 @@ export default {
     margin: "0 auto",
     display: "flex",
     paddingLeft: "15px",
-    // marginTop: "50px",
-    // marginBottom: "13px",
-    div: {fontSize: "22px", fontWeight: "bold"},
+    fontFamily: '"Archivo Narrow", "Noto Sans KR", sans-serif',
+    fontSize: "22px",
+    fontWeight: 700,
+    letterSpacing: "0.06em",
+    color: "#1A120B",
   },
   newGoods: {
     display: "flex",
@@ -205,6 +207,8 @@ export default {
     width: "25%",
     display: "flex",
     flexDirection: "column",
+    padding: "0 10px",
+    boxSizing: "border-box",
     a: {textDecoration: "none"},
   },
   cardContent: {
@@ -212,7 +216,7 @@ export default {
     width: "100%",
     img: {width: "226px", height: "226px", display: "block", margin: "0 auto"},
     "div strong": {
-      color: "navy",
+      color: "#1A120B",
     },
     "div:last-child": {
       overflow: "hidden",
@@ -246,6 +250,9 @@ export default {
   categoryTitle: {
     fontSize: "22px",
     fontWeight: "bold",
+    fontFamily: '"Archivo Narrow", "Noto Sans KR", sans-serif',
+    letterSpacing: "0.06em",
+    color: "#1A120B",
   },
   // ListView
   listViewBox: {
@@ -256,8 +263,8 @@ export default {
   productBox: {
     display: "flex",
     margin: "40px auto 20px",
-    border: "1px solid #ededed",
-    backgroundColor: "#FFF",
+    border: "2px solid #1A120B",
+    backgroundColor: "#F3E6C9",
   },
   productLeft: {
     width: "510px",
@@ -294,15 +301,15 @@ export default {
       span: {
         paddingRight: "12px",
         marginRight: "1px",
-        backgroundColor: "#ffffff",
+        backgroundColor: "#F3E6C9",
       },
     },
   },
   productCost: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#F3E6C9",
     paddingLeft: "12px",
     fontSize: "24px",
-    color: "#6b90dc",
+    color: "#1A120B",
   },
   productBtnArea: {
     marginTop: "10px",
@@ -394,7 +401,7 @@ export default {
     left: 0,
     width: "100%",
     borderBottom: "1px solid black",
-    background: "#fff",
+    backgroundColor: "#F3E6C9",
     zIndex: 110,
     "> ul": {width: 1024, borderBottom: 0},
     "> div": {
@@ -428,22 +435,23 @@ export default {
     height: "40px",
     display: "flex",
     justifyContent: "space-around",
-    borderBottom: "1px solid black",
+    borderBottom: "2px solid #1A120B",
     position: "sticky",
     margin: "0 auto",
     zIndex: 100,
     top: 0,
-    backgroundColor: "#fff",
+    backgroundColor: "#F3E6C9",
     button: {
       width: "100%",
       height: "100%",
       textDecoration: "none",
       padding: "12px 0",
+      color: "#1A120B",
     },
     li: {
       width: "100%",
       textAlign: "center",
-      backgroundColor: "#f3f5f7",
+      backgroundColor: "#F3E6C9",
     },
   },
   // TackBack 반품 정보
@@ -462,14 +470,14 @@ export default {
   },
   // CARTLIST + ORDER
   orderWrapper: {
-    backgroundColor: "#ebebeb",
+    backgroundColor: "#B48445",
   },
   // CARTLIST
   orderBox: {
-    backgroundColor: "#ffffff",
-    border: "1px solid #e0e0e0",
+    backgroundColor: "#F3E6C9",
+    border: "2px solid #1A120B",
     padding: "20px 40px",
-    borderRadius: "20px",
+    borderRadius: 0,
     margin: "80px 0",
   },
   cartTitle: {
@@ -562,9 +570,10 @@ export default {
   },
   orderSheetBottomBox: {
     maxWidth: "1024px",
-    backgroundColor: "#ffffff",
-    borderRadius: "20px",
+    backgroundColor: "#F3E6C9",
+    borderRadius: 0,
     marginTop: "10px",
+    border: "2px solid #1A120B",
   },
   orderSheetDeliveryBox: {
     padding: "30px 40px",
@@ -626,8 +635,8 @@ export default {
   },
   orderSheetOrderBtn: {
     width: "100%",
-    backgroundColor: "#9ac66d !important",
-    color: "#fff !important",
+    backgroundColor: "#1A120B !important",
+    color: "#F3E6C9 !important",
     textAlign: "center",
     padding: "10px",
     cursor: "pointer",

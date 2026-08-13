@@ -1,4 +1,4 @@
-const primaryColor = "#9ac66d";
+const primaryColor = "#1A120B";
 export default {
   //MGnb
   mgnb: {
@@ -7,7 +7,7 @@ export default {
     height: "80px",
     flexDirection: "column",
     position: "sticky",
-    backgroundColor: "#fff",
+    backgroundColor: "#F3E6C9",
     top: 0,
     zIndex: "1000",
   },
@@ -84,7 +84,7 @@ export default {
   menubar: {
     width: "100%",
     height: "40px",
-    backgroundColor: "#fff",
+    backgroundColor: "#F3E6C9",
   },
   menulist: {
     display: "-webkit-box",
@@ -120,6 +120,16 @@ export default {
     display: "flex",
     flexDirection: "column",
     margin: "0 auto",
+    padding: "8px 12px 40px",
+    boxSizing: "border-box",
+  },
+  newGoodsHeader: {
+    margin: "8px 4px 16px",
+    fontFamily: '"Archivo Narrow", "Noto Sans KR", sans-serif',
+    fontSize: "20px",
+    fontWeight: 700,
+    letterSpacing: "0.06em",
+    color: "#1A120B",
   },
   // COMMON
   none: {
@@ -168,7 +178,7 @@ export default {
       width: "100%",
     },
     "div strong": {
-      color: "navy",
+      color: "#1A120B",
     },
   },
   cardInfo: {
@@ -202,8 +212,8 @@ export default {
     display: "flex",
     flexDirection: "column",
     // margin: "-1px 0 20px",
-    border: "1px solid #ededed",
-    backgroundColor: "#FFF",
+    border: "2px solid #1A120B",
+    backgroundColor: "#F3E6C9",
   },
   productImageArea: {
     width: "100%",
@@ -243,15 +253,15 @@ export default {
       span: {
         paddingRight: "12px",
         marginRight: "1px",
-        backgroundColor: "#ffffff",
+        backgroundColor: "#F3E6C9",
       },
     },
   },
   productCost: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#F3E6C9",
     paddingLeft: "12px",
     fontSize: "24px",
-    color: "#6b90dc",
+    color: "#1A120B",
   },
   productBtnArea: {
     marginTop: "10px",
@@ -350,7 +360,7 @@ export default {
     position: "sticky",
     top: "80px",
     zIndex: 100,
-    backgroundColor: "#fff",
+    backgroundColor: "#F3E6C9",
     button: {
       width: "100%",
       height: "100%",
@@ -360,7 +370,7 @@ export default {
     li: {
       width: "100%",
       textAlign: "center",
-      backgroundColor: "#f3f5f7",
+      backgroundColor: "#E8D7B4",
     },
   },
   // productTabContainer
@@ -371,7 +381,7 @@ export default {
     bottom: 0,
     left: 0,
     width: "100%",
-    background: "#fff",
+    background: "#F3E6C9",
     zIndex: 110,
     "> ul": {width: "100%", borderBottom: 0},
     "> div": {
@@ -454,17 +464,21 @@ export default {
   },
   categoryTitleBox: {
     display: "flex",
-    marginTop: "50px",
+    marginTop: "16px",
     marginBottom: "13px",
+    padding: "0 12px",
     "> div": {
-      fontSize: "22px",
-      fontWeight: "bold",
+      fontFamily: '"Archivo Narrow", "Noto Sans KR", sans-serif',
+      fontSize: "20px",
+      fontWeight: 700,
+      letterSpacing: "0.06em",
+      color: "#1A120B",
     },
   },
   // CART
   MCartContainer: {
     width: "100%",
-    backgroundColor: "#ebebeb",
+    backgroundColor: "#B48445",
   },
   MCartFormBox: {
     width: "100%",
@@ -473,7 +487,7 @@ export default {
   },
   MCartBox: {
     width: "calc(100% - 40px)",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#F3E6C9",
     padding: "20px",
     textAlign: "center",
   },
@@ -599,7 +613,7 @@ export default {
   },
   // MOrderSheet
   orderSheet: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#F3E6C9",
     padding: "12px",
     h1: {
       width: "100%",
@@ -657,7 +671,7 @@ export default {
   },
   orderSheetDeliveryBox: {
     width: "700px",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#F3E6C9",
     borderRadius: "20px 0 0 20px",
     padding: "30px 40px",
     wordBreak: "break-all",
@@ -699,8 +713,8 @@ export default {
   },
   orderSheetOrderBtn: {
     width: "100%",
-    backgroundColor: "#9ac66d !important",
-    color: "#fff !important",
+    backgroundColor: "#1A120B !important",
+    color: "#F3E6C9 !important",
     textAlign: "center",
     padding: "10px",
     marginTop: "20px",
