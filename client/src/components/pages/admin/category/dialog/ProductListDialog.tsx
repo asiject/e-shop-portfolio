@@ -4,7 +4,7 @@ import Loading from "@layout/Loading";
 import {AppBar, Button, Dialog, IconButton, Slide, Toolbar, Typography} from "@mui/material";
 import {TransitionProps} from "@mui/material/transitions";
 import CloseIcon from "@mui/icons-material/Close";
-import {getProductListQuery} from "@recoils/product/query";
+import {useProductListQuery} from "@recoils/product/query";
 import ProductList from "../list/ProductList";
 
 const Transition = React.forwardRef(function Transition(
@@ -18,10 +18,10 @@ const Transition = React.forwardRef(function Transition(
 
 export default function ProductListDialog({initItems, open, setOpen, handleAddItems}: any) {
   const [selected, setSelected]: any = useState(initItems);
-  const {isLoading, isError, data, error} = getProductListQuery();
+  const {isLoading, isError, data, error} = useProductListQuery();
   useEffect(() => {
     setSelected(initItems);
-  }, [open]);
+  }, [open, initItems]);
   if (isLoading) {
     return <Loading />;
   }

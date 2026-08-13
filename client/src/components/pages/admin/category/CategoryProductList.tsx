@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {AppBar, Toolbar, IconButton, Box} from "@mui/material";
-import {getCategoryInfoQuery} from "@recoils/category/query";
+import {useCategoryInfoQuery} from "@recoils/category/query";
 import {useNavigate, useParams} from "react-router";
 import Loading from "@layout/Loading";
 import Error from "@layout/Error";
@@ -16,7 +16,7 @@ export default function CategoryProductList() {
   const [open, setOpen] = useState(false);
   const [list, setList]: any = useState([]);
   const [selected, setSelected]: any = useState([]);
-  const {isLoading, isError, data, error} = getCategoryInfoQuery(Number(id));
+  const {isLoading, isError, data, error} = useCategoryInfoQuery(Number(id));
   useEffect(() => {
     if (data?.products) {
       setList(data.products?.map((item: any) => item?.product));
@@ -38,25 +38,18 @@ export default function CategoryProductList() {
     }
   };
   const handleAddItems = async (items: any) => {
-    console.log("items >", items);
     const formData = {
       pids: items?.map((v: any) => v.id),
     };
     await postCategoryProduct(Number(id), formData);
-    setList([...items]);
+    // 다이얼로그 선택 결과(전체)를 목록으로 반영
+    setList([...(items || [])]);
     setSelected([]);
   };
   const handleRemoveItems = async () => {
-    let removeItems = [...list];
-    for (const item of selected) {
-      await deleteCategoryProduct(Number(id), item?.id);
-      const idx = removeItems?.findIndex((obj: any) => obj?.id == item?.id);
-      if (idx > -1) {
-        removeItems = [...removeItems.slice(0, idx), ...removeItems.slice(idx + 1, removeItems?.length)];
-      }
-    }
-    setList([...removeItems]);
-
+    await Promise.all(selected.map((item: any) => deleteCategoryProduct(Number(id), item?.id)));
+    const selectedIds = new Set(selected.map((item: any) => item?.id));
+    setList(list.filter((item: any) => !selectedIds.has(item?.id)));
     setSelected([]);
   };
 

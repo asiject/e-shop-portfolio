@@ -6,52 +6,53 @@ import CheckedList from "./list/CheckedList";
 import AdminGnb from "@layout/AdminGnb";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import {getProductListQuery} from "@recoils/product/query";
+import DeleteIcon from "@mui/icons-material/Delete";
+import {useProductListQuery} from "@recoils/product/query";
 import AddIcon from "@mui/icons-material/Add";
 import {useNavigate} from "react-router";
-import {putProductSortno} from "@recoils/admin/product/axios";
+import {deleteAdminProduct, putProductSortno} from "@recoils/admin/product/axios";
+import {useQueryClient} from "react-query";
 
 export default function ProductList() {
+  const queryClient = useQueryClient();
   const [selected, setSelected]: any = useState([]);
-  const [open, setOpen] = useState(false);
   const [list, setList]: any = useState([]);
-  const {isLoading, isError, data, error} = getProductListQuery();
+  const {isLoading, isError, data, error} = useProductListQuery();
+
   useEffect(() => {
     if (data) {
       setList(data);
     }
   }, [data]);
+
   if (isLoading) {
     return <Loading />;
   }
   if (isError) {
     return <Error error={error} />;
   }
-  const handleAddItems = (item: any) => {
-    console.log("item >>", item);
-    // setList(item);
-  };
 
-  const handleRemoveItems = () => {
-    let removeItems = list;
-    for (const obj of selected) {
-      const idx = removeItems?.findIndex((item: any) => item?.id == obj?.id);
-      if (idx > -1) {
-        removeItems = [...removeItems.slice(0, idx), ...removeItems.slice(idx + 1, list?.length)];
-      }
+  const handleRemoveItems = async () => {
+    if (!selected?.length) return;
+    if (!confirm(`선택한 ${selected.length}개 상품을 삭제할까요?`)) return;
+    try {
+      await Promise.all(selected.map((item: any) => deleteAdminProduct(Number(item.id))));
+      const selectedIds = new Set(selected.map((item: any) => item.id));
+      setList((prev: any[]) => prev.filter(item => !selectedIds.has(item.id)));
+      setSelected([]);
+      queryClient.invalidateQueries("getProductList");
+    } catch (err) {
+      console.error(err);
+      alert("상품 삭제에 실패했습니다");
     }
-    setList([...removeItems]);
-    setSelected([]);
   };
 
   const handleItemUseYn = async (showyn: string) => {
     const products = selected?.map((item: any) => {
       return {id: item?.id, showyn};
     });
-    console.log("products >", products);
     await putProductSortno(products);
 
-    // 선택한 놈들 useyn 변경도 같이 해야함.
     let selectItems = list;
     for (const obj of selected) {
       const idx = selectItems?.findIndex((item: any) => item?.id == obj?.id);
@@ -64,24 +65,17 @@ export default function ProductList() {
     setList([...selectItems]);
     setSelected([]);
   };
+
   return (
-    <AdminGnb
-      RightButtons={<RightButtons selected={selected} setOpen={setOpen} handleRemoveItems={handleRemoveItems} handleItemUseYn={handleItemUseYn} />}>
-      <MainPane list={list} selected={selected} setSelected={setSelected} open={open} setOpen={setOpen} handleAddItems={handleAddItems} />
+    <AdminGnb RightButtons={<RightButtons selected={selected} handleRemoveItems={handleRemoveItems} handleItemUseYn={handleItemUseYn} />}>
+      <MainPane list={list} selected={selected} setSelected={setSelected} />
     </AdminGnb>
   );
 }
-//미선택 > 카테고리 추가...
-/*
-  > 카테고리 수정/삭제(상세)
-            미사용/사용
-            카테고리에 상품 추가
-*/
-function RightButtons({selected, setOpen, handleRemoveItems, handleItemUseYn}: any) {
+
+function RightButtons({selected, handleRemoveItems, handleItemUseYn}: any) {
   const navigate = useNavigate();
   const onMovePage = () => {
-    console.log("ss");
-    // Dialog로 처리??
     navigate("/admin/product/write");
   };
   const buttonList = [
@@ -89,6 +83,13 @@ function RightButtons({selected, setOpen, handleRemoveItems, handleItemUseYn}: a
       <Tooltip key="add" title="추가">
         <IconButton edge="end" sx={{color: "white"}} onClick={onMovePage}>
           <AddIcon />
+        </IconButton>
+      </Tooltip>
+    ),
+    selected?.length > 0 && (
+      <Tooltip key="delete" title="삭제">
+        <IconButton edge="end" sx={{color: "white"}} onClick={handleRemoveItems}>
+          <DeleteIcon />
         </IconButton>
       </Tooltip>
     ),
@@ -119,10 +120,7 @@ function RightButtons({selected, setOpen, handleRemoveItems, handleItemUseYn}: a
   ].filter(Boolean);
   return <>{buttonList}</>;
 }
+
 function MainPane({list, selected, setSelected}: any) {
-  return (
-    <>
-      <CheckedList list={list} selected={selected} setSelected={setSelected} />
-    </>
-  );
+  return <CheckedList list={list} selected={selected} setSelected={setSelected} />;
 }
