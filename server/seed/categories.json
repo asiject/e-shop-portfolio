@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "title": "신상품",
+    "type": "PRODUCT",
+    "link": "/category/1",
+    "sortno": 1,
+    "useyn": "Y"
+  },
+  {
+    "id": 2,
+    "title": "베스트",
+    "type": "PRODUCT",
+    "link": "/category/2",
+    "sortno": 2,
+    "useyn": "Y"
+  },
+  {
+    "id": 3,
+    "title": "세일",
+    "type": "PRODUCT",
+    "link": "/category/3",
+    "sortno": 3,
+    "useyn": "Y"
+  }
+]
