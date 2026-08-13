@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "@styles": ["components/layout/styles"],
+      "@props": ["components/props.tsx"],
+      "@utils/*": ["utils/*"],
+      "@recoils/*": ["recoils/*"],
+      "@layout/*": ["components/layout/*"],
+      "@thirdparty/*": ["components/thirdparty/*"],
+      "@web/*": ["components/pages/web/*"],
+      "@mobile/*": ["components/pages/mobile/*"],
+      "@admin/*": ["components/pages/admin/*"]
+    }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=dev nodemon",
+    "local": "cross-env NODE_ENV=local nodemon",
+    "build": "tsc -p tsconfig.json",
+    "test": "jest --config ./jest.config.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/cookie": "^8.3.0",
+    "@fastify/cors": "^8.1.0",
+    "@fastify/formbody": "^7.0.0",
+    "@fastify/multipart": "^7.0.0",
+    "@fastify/static": "^6.5.0",
+    "@fastify/view": "^7.4.1",
+    "@types/ejs": "^3.1.1",
+    "@types/jsonwebtoken": "^8.5.8",
+    "@types/xml2js": "^0.4.11",
+    "axios": "^0.26.1",
+    "chart.js": "3.6.2",
+    "crypto-js": "^4.1.1",
+    "date-fns": "^2.27.0",
+    "ejs": "^3.1.6",
+    "fastify": "^4.5.2",
+    "fastify-plugin": "^3.0.1",
+    "google-auth-library": "^8.7.0",
+    "jsonwebtoken": "^8.5.1",
+    "mysql2": "^2.3.3-rc.0",
+    "secure-web-storage": "^1.0.2",
+    "typeorm": "^0.3.6",
+    "uuid": "^8.3.2",
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.5.5",
+    "xml2js": "^0.4.23"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "@types/jest": "^27.5.1",
+    "@types/node": "^17.0.35",
+    "@types/uuid": "^8.3.4",
+    "jest": "^28.1.0",
+    "ts-jest": "^28.0.3",
+    "ts-node": "^10.8.0",
+    "tsconfig-paths": "^4.0.0",
+    "typescript": "^4.7.2"
+  }
+}

@@ -1,0 +1,25 @@
+node_modules
+logs
+yarn-error.log
+package-lock.json
+*.lock
+.DS_Store
+frontend/package-lock.json
+frontend-admin/package-lock.json
+server/public/product
+server/public/temp
+server.ts/package-lock.json
+frontend/yarn-error.log
+frontend/dist/assets/index.693158b8.js
+frontend/dist/assets/index.d5a97567.css
+frontend/.env.production
+frontend/.env
+server/config/config.json
+server/config/json
+.env
+# portfolio public repo
+query.txt
+server/dist
+**/.yarn
+*.tsbuildinfo
+.impeccable
