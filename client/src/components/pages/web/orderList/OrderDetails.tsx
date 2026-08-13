@@ -6,7 +6,7 @@ import axios from "axios";
 import {Box, Button} from "@mui/material";
 
 import {userState} from "@recoils/user/state";
-import {getOrderDetailQuery} from "@recoils/order/query";
+import {useOrderDetailQuery} from "@recoils/order/query";
 import {execute} from "@utils/Executor";
 import dateFormat from "@utils/DateFormat";
 import statusCheck from "@utils/StatusCheck";
@@ -14,8 +14,6 @@ import Loading from "@layout/Loading";
 import Error from "@layout/Error";
 import {Styles} from "@styles";
 import {numberFormat} from "@utils/Numaric";
-
-const primaryColor = "#9ac66d";
 
 export default function OrderDetails() {
   const {id} = useParams();
@@ -26,7 +24,7 @@ export default function OrderDetails() {
   const navigate = useNavigate();
   const styles = Styles();
 
-  const {isLoading, isError, data, error} = getOrderDetailQuery({userid: loginUser?.userid, orderid: id || ""});
+  const {isLoading, isError, data, error} = useOrderDetailQuery({userid: loginUser?.userid, orderid: id || ""});
   console.log("data >", data);
   useEffect(() => {
     setDetailInfo(data);
@@ -95,8 +93,8 @@ export default function OrderDetails() {
           </Box>
         </Box>
         {detailList &&
-          detailList.map((item: any, index: number) => {
-            return <DetailList key={index} item={item} userid={loginUser.userid} />;
+          detailList.map((item: any) => {
+            return <DetailList key={`${item.productid}-${item.itemid}`} item={item} userid={loginUser.userid} />;
           })}
 
         <Box sx={{margin: "25px 0 9px"}}>주문 정보</Box>

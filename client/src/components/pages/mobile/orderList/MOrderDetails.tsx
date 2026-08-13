@@ -6,7 +6,7 @@ import axios from "axios";
 import {Box, Button, Table, TableHead, TableBody, TableCell, TableRow, TextField, Checkbox} from "@mui/material";
 
 import {userState} from "@recoils/user/state";
-import {getOrderDetailQuery} from "@recoils/order/query";
+import {useOrderDetailQuery} from "@recoils/order/query";
 import {numberFormat} from "@utils/Numaric";
 import {execute} from "@utils/Executor";
 import dateFormat from "@utils/DateFormat";
@@ -15,17 +15,15 @@ import Loading from "@layout/Loading";
 import Error from "@layout/Error";
 import {MStyles} from "@styles";
 
-const primaryColor = "#9ac66d";
-
 export default function MOrderDetails() {
   const {id} = useParams();
   const user = useRecoilValue(userState);
-  // const [getOrderDetailQuery, setOrderDetailQuery] = useRecoilState(orderDetailQuery);
+  // const [useOrderDetailQuery, setOrderDetailQuery] = useRecoilState(orderDetailQuery);
   const [detailInfo, setDetailInfo] = useState<any>();
   const [detailList, setDetailList] = useState<any>();
   const loginUser = user;
   const navigate = useNavigate();
-  const {isLoading, isError, data, error} = getOrderDetailQuery({userid: user.userid, orderid: id || ""});
+  const {isLoading, isError, data, error} = useOrderDetailQuery({userid: user.userid, orderid: id || ""});
   useEffect(() => {
     if (loginUser) {
       if (data) {
@@ -47,7 +45,7 @@ export default function MOrderDetails() {
     } else {
       navigate("/login");
     }
-  }, [data]);
+  }, [data, loginUser, navigate]);
 
   if (isLoading) {
     return <Loading />;
@@ -112,8 +110,8 @@ export default function MOrderDetails() {
               <TableRow>
                 <TableCell colSpan={2}>
                   {detailList &&
-                    detailList.map((item: any, index: number) => {
-                      return <ListItem key={index} item={item} />;
+                    detailList.map((item: any) => {
+                      return <ListItem key={`${item.productid}-${item.itemid}`} item={item} />;
                     })}
                 </TableCell>
               </TableRow>

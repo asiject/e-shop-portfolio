@@ -5,7 +5,7 @@ import {useParams, useNavigate} from "react-router-dom";
 import {Box} from "@mui/material";
 
 import {userState} from "@recoils/user/state";
-import {getOrderSheetResultQuery} from "@recoils/order/query";
+import {useOrderSheetResultQuery} from "@recoils/order/query";
 import {numberFormat} from "@utils/Numaric";
 import {Styles} from "@styles";
 export default function OrderSheetResult() {
@@ -16,7 +16,7 @@ export default function OrderSheetResult() {
   const [result, setResult] = useState(null);
   const navigate = useNavigate();
   const loginUser = useRecoilValue(userState);
-  const {isLoading, isError, data, error} = getOrderSheetResultQuery({userid: loginUser?.userid, orderid: id || ""});
+  const {isLoading, isError, data, error} = useOrderSheetResultQuery({userid: loginUser?.userid, orderid: id || ""});
   const styles = Styles();
   useEffect(() => {
     if (loginUser) {
@@ -26,7 +26,7 @@ export default function OrderSheetResult() {
     } else {
       navigate("/login");
     }
-  }, [data]);
+  }, [data, loginUser, navigate]);
   const orderSheetResultFunc = async (data: any) => {
     const result = data;
     const {products, payment, buyer, delivery} = result;
@@ -59,8 +59,8 @@ export default function OrderSheetResult() {
                   <Box>수량</Box>
                   <Box>가격</Box>
                 </Box>
-                {productList.map((product, index) => {
-                  return <Product key={index} product={product} />;
+                {productList.map(product => {
+                  return <Product key={`${product.productid}-${product.itemid}`} product={product} />;
                 })}
               </Box>
               <Box sx={{textAlign: "right", marginTop: "20px"}}>

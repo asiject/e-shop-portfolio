@@ -6,7 +6,7 @@ import axios from "axios";
 import {Box, Button, Checkbox, Table, TableBody, TableCell, TableFooter, TableHead, TableRow} from "@mui/material";
 
 import {userState} from "@recoils/user/state";
-import {getCartListQuery} from "@recoils/cart/query";
+import {useCartListQuery} from "@recoils/cart/query";
 import {execute} from "@utils/Executor";
 import {numberFormat} from "@utils/Numaric";
 import {Styles} from "@styles";
@@ -21,64 +21,53 @@ export default function CartList() {
     : window.location.protocol + "//" + window.location.hostname;
 
   const styles = Styles();
-  const {isLoading, isError, data, error} = getCartListQuery(loginUser?.userid);
+  const {isLoading, isError, data, error} = useCartListQuery(loginUser?.userid);
 
   console.log("data >", data);
   // 장바구니 목록 가져오기, userid 받아오기
   useEffect(() => {
-    // 새로고침시 userState 가 null이 되었다가 webStorage에서 데이터를 받아와서 null일 경우 webStorage에서 받아오는 데이터로 검증
-    if (loginUser) {
-      // cartListFunc(loginUser);
-      if (data) {
-        setItemList(
-          data?.map((item: any) => {
-            // console.log("item data : ", item);
-            return {
-              id: item.id,
-              userid: item.userid,
-              productid: item.product.id,
-              pid: item.pid,
-              itemid: item.itemid,
-              thumbnail: String(host + item.product.thumbnail),
-              maxCapacity: Number(item.product.capacity),
-              title: item.product.title,
-              option: item.option,
-              count: Number(item.count),
-              cost: Number(item.cost),
-              isChecked: true,
-            };
-          }),
-        );
-      }
-    } else {
+    if (!loginUser) {
       navigate("/login");
+      return;
     }
-  }, [data]);
-  useEffect(() => {
-    if (itemList?.length > 0) {
-      changeAllCheckBox(true);
-    }
-  }, [itemList]);
+    if (!data) return;
+    const mapped = data.map((item: any) => ({
+      id: item.id,
+      userid: item.userid,
+      productid: item.product.id,
+      pid: item.pid,
+      itemid: item.itemid,
+      thumbnail: String(host + item.product.thumbnail),
+      maxCapacity: Number(item.product.capacity),
+      title: item.product.title,
+      option: item.option,
+      count: Number(item.count),
+      cost: Number(item.cost),
+      isChecked: true,
+    }));
+    setItemList(mapped);
+    setSelectItems(mapped);
+    setTotalCost(mapped.reduce((sum: number, item: any) => sum + item.count * item.cost, 0));
+  }, [data, host, loginUser, navigate]);
 
   const changeCheckbox = (checked: Boolean, item: any, cost: number) => {
     if (checked) {
-      setSelectItems([...selectItems, item]);
-      setTotalCost(totalCost + cost);
+      setSelectItems(prev => [...prev, item]);
+      setTotalCost(prev => prev + cost);
     } else {
-      setSelectItems(selectItems.filter((selectItem: any) => selectItem.id !== item.id));
-      setTotalCost(totalCost - cost);
+      setSelectItems(prev => prev.filter((selectItem: any) => selectItem.id !== item.id));
+      setTotalCost(prev => prev - cost);
     }
   };
   const changeAllCheckBox = (checked: Boolean) => {
     if (checked) {
-      // console.log("itemList >>", itemList);
       const itemArray: Array<any> = [];
       let tempCost = 0;
       itemList.map(item => {
         itemArray.push(item);
         tempCost += item.count * item.cost;
-        setTotalCost(tempCost);
       });
+      setTotalCost(tempCost);
       setSelectItems(itemArray);
     } else {
       setSelectItems([]);
@@ -151,8 +140,8 @@ export default function CartList() {
             </TableHead>
             <TableBody>
               {itemList?.length > 0 &&
-                itemList.map((item, i) => {
-                  return <ItemList key={i} item={item} selectItems={selectItems} changeCheckbox={changeCheckbox} handleEditCart={handleEditCart} />;
+                itemList.map(item => {
+                  return <ItemList key={item.id} item={item} selectItems={selectItems} changeCheckbox={changeCheckbox} handleEditCart={handleEditCart} />;
                 })}
 
               <TableRow>
@@ -255,7 +244,9 @@ function ItemList({
   changeCheckbox: Function;
   handleEditCart: Function;
 }) {
-  const [count, setCount] = useState(item.count);
+  // 한글 주석: item.count를 단일 소스로 두고, 리렌더만 tick으로 유도
+  const [, setTick] = useState(0);
+  const count = item.count;
   const styles = Styles();
 
   return (
@@ -279,9 +270,9 @@ function ItemList({
         <Box sx={styles.flex}>
           <Button
             onClick={e => {
-              if (count > 1) {
+              if (item.count > 1) {
                 item.count--;
-                setCount(count - 1);
+                setTick(t => t + 1);
               }
             }}>
             &lt;
@@ -290,13 +281,14 @@ function ItemList({
           <Box sx={styles.cartListTableStockPadding}>{count}</Box>
           <Button
             onClick={e => {
-              if (count < item.maxCapacity) {
+              if (item.count < item.maxCapacity) {
                 item.count++;
-                setCount(count + 1);
+                setTick(t => t + 1);
               }
               if (item.count > 10000) {
                 alert("1만개 이하만 주문할 수 있습니다");
                 item.count = 10000;
+                setTick(t => t + 1);
               }
             }}>
             &gt;

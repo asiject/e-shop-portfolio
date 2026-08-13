@@ -10,7 +10,7 @@ import AddIcon from "@mui/icons-material/Add";
 
 import {Styles} from "@styles";
 import {userState} from "@recoils/user/state";
-import {getOrderListQuery} from "@recoils/order/query";
+import {useOrderListQuery} from "@recoils/order/query";
 import {numberFormat} from "@utils/Numaric";
 import {execute} from "@utils/Executor";
 import dateFormat from "@utils/DateFormat";
@@ -24,7 +24,7 @@ export default function OrderList() {
   const loginUser = useRecoilValue(userState);
   const navigate = useNavigate();
   const styles = Styles();
-  const {isLoading, isError, data, error} = getOrderListQuery({userid: loginUser?.userid});
+  const {isLoading, isError, data, error} = useOrderListQuery({userid: loginUser?.userid});
 
   console.log("data >", data);
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function OrderList() {
     } else {
       navigate("/login");
     }
-  }, [data]);
+  }, [data, loginUser, navigate]);
 
   if (isLoading) {
     return <Loading />;
@@ -52,7 +52,7 @@ export default function OrderList() {
               sx={{width: "100%"}}
               size="small"
               InputProps={{
-                endAdornment: <SearchIcon sx={{cursor: "pointer", color: "#9ac66d"}} />,
+                endAdornment: <SearchIcon sx={{cursor: "pointer", color: "#1A120B"}} />,
               }}
             />
           </Box>
@@ -62,8 +62,8 @@ export default function OrderList() {
             </Button>
           </Box>
         </Box>
-        {orderList?.map((list, index) => {
-          return <OrderedList key={index} list={list} />;
+        {orderList?.map(list => {
+          return <OrderedList key={list.orderid} list={list} />;
         })}
         <Box
           sx={{
@@ -143,8 +143,8 @@ function OrderedList({list}: {list: any}) {
             {status}
           </Box>
           {list &&
-            list.products.map((item: any, index: number) => {
-              return <ListItem key={index} item={item} />;
+            list.products.map((item: any) => {
+              return <ListItem key={`${item.productid}-${item.itemid}`} item={item} />;
             })}
         </Box>
         <Box

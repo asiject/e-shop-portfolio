@@ -6,7 +6,7 @@ import {Carousel} from "@sefailyasoz/react-carousel";
 
 import {Box, Button} from "@mui/material";
 
-import {getProductQuery} from "@recoils/product/query";
+import {useProductQuery} from "@recoils/product/query";
 import {numberFormat} from "@utils/Numaric";
 import ContentMenubar from "./ContentMenubar";
 import MProductDetail from "./MProductDetail";
@@ -51,8 +51,6 @@ export default function MProduct() {
   const [optLen, setOptLen] = useState(0);
   const [selectList, setSelectList] = useState([]);
   const [packageMethod, setPackageMethod] = useState("");
-  const [totalStock, setTotalStock] = useState(0);
-  const [totalCost, setTotalCost] = useState(0);
   const productTabContainer = useRef<HTMLElement | null>();
   const detailPage = useRef<HTMLElement>();
   const showEasyToBuy = useRef<HTMLElement | null>();
@@ -60,7 +58,7 @@ export default function MProduct() {
   const closeBtn = useRef<HTMLElement | null>();
 
   const navigate = useNavigate();
-  const {isLoading, isError, data, error} = getProductQuery(productid || "", {
+  const {isLoading, isError, data, error} = useProductQuery(productid || "", {
     refetchOnWindowFocus: false,
     retry: 0,
     onSuccess: async (result: any) => {
@@ -212,10 +210,6 @@ export default function MProduct() {
             setSelectList={setSelectList}
             packageMethod={packageMethod}
             setPackageMethod={setPackageMethod}
-            totalCost={totalCost}
-            setTotalCost={setTotalCost}
-            totalStock={totalStock}
-            setTotalStock={setTotalStock}
             tabYn={false}
           />
         )}
@@ -273,10 +267,6 @@ export default function MProduct() {
                 setSelectList={setSelectList}
                 packageMethod={packageMethod}
                 setPackageMethod={setPackageMethod}
-                totalCost={totalCost}
-                setTotalCost={setTotalCost}
-                totalStock={totalStock}
-                setTotalStock={setTotalStock}
                 tabYn={"Y"}
               />
             )}

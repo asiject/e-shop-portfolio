@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React from "react";
 import {FormControl, InputLabel, MenuItem, Select} from "@mui/material";
 import {numberFormat} from "@utils/Numaric";
 import {Styles} from "@styles";
@@ -13,19 +13,9 @@ export default function Options({
   setSelectFair,
   selectList,
   setSelectList,
-  totalCost,
-  setTotalCost,
-  totalStock,
-  setTotalStock,
 }: any) {
-  const [title, setTitle] = useState("");
+  const title = selectFair.find((s: any) => s.key === optkey)?.value ?? "";
   const styles = Styles();
-
-  useEffect(() => {
-    if (selectFair.length == 0) {
-      setTitle("");
-    }
-  }, [selectFair]);
 
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
@@ -36,7 +26,6 @@ export default function Options({
     } else if (selectFair[0].key != optkey) {
       setSelectFair([...selectFair, {key: optkey, value: e.target.value}]);
     }
-    setTitle(e.target.value);
     // 마지막번째 옵션과 seq이 같은 경우
     if (seq == optLen) {
       const item = itemList.filter((item: any) => item.itemkey == selectFair[0].value && item.itemval == e.target.value)[0];
@@ -47,13 +36,10 @@ export default function Options({
         // 선택한 옵션을 다시 선택한 경우
         alert("이미 선택한 옵션입니다.");
       } else {
-        // 선택 상품 리스트에 추가, 전체 수량, 전체 가격 증가, 선택상품 Fair 초기화
+        // 선택 상품 리스트에 추가 (totals는 부모에서 selectList로 도출)
         setSelectList([...selectList, {itemid: item.itemid, val: item.val, cost: item.cost, stock: 1}]);
-        setTotalCost(totalCost + item.cost);
-        setTotalStock(totalStock + 1);
         setSelectFair([]);
       }
-      setTitle("");
     }
     //TODO:  장바구니나 구매하기 누르면 데이터 넘어가야함
   };
@@ -74,12 +60,12 @@ export default function Options({
           },
         }}>
         {optval &&
-          optval.map((val: string, i: number) => {
+          optval.map((val: string) => {
             let text = `${val}`;
             // 마지막 seq가 아니면
             if (seq != optLen) {
               return (
-                <MenuItem key={i} value={val}>
+                <MenuItem key={`${optkey}-${val}`} value={val}>
                   {val}
                 </MenuItem>
               );
@@ -96,7 +82,7 @@ export default function Options({
                 text += ` (품절)`;
               }
               return (
-                <MenuItem key={i} value={val}>
+                <MenuItem key={`${optkey}-${val}`} value={val}>
                   {text}
                 </MenuItem>
               );

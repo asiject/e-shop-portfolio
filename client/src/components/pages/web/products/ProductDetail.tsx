@@ -24,10 +24,6 @@ export default function ProductDetail({
   setSelectList,
   packageMethod,
   setPackageMethod,
-  totalCost,
-  setTotalCost,
-  totalStock,
-  setTotalStock,
   tabYn,
 }: any) {
   const navigate = useNavigate();
@@ -35,6 +31,16 @@ export default function ProductDetail({
   const user = useRecoilValue(userState);
 
   const styles = Styles();
+  // selectList 기준 총액/총수량 (옵션 없으면 product 기본값)
+  const totalStock =
+    selectList.length > 0 ? selectList.reduce((sum: number, item: any) => sum + item.stock, 0) : optLen > 0 ? 0 : product.stock || 1;
+  const totalCost =
+    selectList.length > 0
+      ? selectList.reduce((sum: number, item: any) => sum + item.cost * item.stock, 0)
+      : optLen > 0
+        ? 0
+        : product.cost * (product.stock || 1);
+
   const handleAddCart = async (product: any) => {
     await execute(async () => {
       const {data} = await api.post(`/cart/`, product);
@@ -82,9 +88,8 @@ export default function ProductDetail({
             // console.log("opt >>>", opt);
             const optval = opt[0].val.split(",");
             return (
-              <Box key={i}>
+              <Box key={optkey}>
                 <Options
-                  key={i}
                   seq={i + 1}
                   optLen={optLen}
                   optkey={optkey}
@@ -94,10 +99,6 @@ export default function ProductDetail({
                   setSelectFair={setSelectFair}
                   selectList={selectList}
                   setSelectList={setSelectList}
-                  totalCost={totalCost}
-                  setTotalCost={setTotalCost}
-                  totalStock={totalStock}
-                  setTotalStock={setTotalStock}
                 />
               </Box>
             );
@@ -110,16 +111,12 @@ export default function ProductDetail({
               const itemInfo = itemList.filter((item: any) => item.val == selectItem.val)[0];
               return (
                 <Item
-                  key={i}
+                  key={selectItem.itemid ?? selectItem.val}
                   seq={i}
                   optLen={optLen}
                   itemInfo={itemInfo}
                   selectList={selectList}
                   setSelectList={setSelectList}
-                  totalCost={totalCost}
-                  setTotalCost={setTotalCost}
-                  totalStock={totalStock}
-                  setTotalStock={setTotalStock}
                 />
               );
             })
@@ -130,10 +127,6 @@ export default function ProductDetail({
               itemInfo={product}
               selectList={selectList}
               setSelectList={setSelectList}
-              totalCost={totalCost}
-              setTotalCost={setTotalCost}
-              totalStock={totalStock}
-              setTotalStock={setTotalStock}
             />
           )}
         </Box>
@@ -189,26 +182,26 @@ export default function ProductDetail({
           </Button>
           <Button variant="outlined" sx={styles.productCartBtn} size="large">
             <Box
-              onClick={() => {
+              onClick={async () => {
                 if (user) {
-                  let data = {};
                   if (optLen > 0) {
                     // console.log("장바구니 옵션 있음 : ", product, selectList);
-                    selectList.map(async (item: any) => {
-                      data = {
-                        userid: user.userid,
-                        productid: product.id,
-                        pid: product.id,
-                        itemid: item.itemid,
-                        option: item.val,
-                        count: item.stock,
-                        cost: item.cost,
-                      };
-                      await handleAddCart(data);
-                    });
+                    await Promise.all(
+                      selectList.map((item: any) =>
+                        handleAddCart({
+                          userid: user.userid,
+                          productid: product.id,
+                          pid: product.id,
+                          itemid: item.itemid,
+                          option: item.val,
+                          count: item.stock,
+                          cost: item.cost,
+                        }),
+                      ),
+                    );
                   } else {
                     // console.log("장바구니 옵션 없음 : ", product);
-                    data = {
+                    await handleAddCart({
                       userid: user.userid,
                       productid: product.id,
                       pid: product.id,
@@ -216,8 +209,7 @@ export default function ProductDetail({
                       option: "",
                       count: product.stock,
                       cost: product.cost,
-                    };
-                    handleAddCart(data);
+                    });
                     // userid, productid, itemid, option(itemval), count, cost
                     // EX) "abc@gmail.com", 1, 0, "", 1, "8000"
                   }
