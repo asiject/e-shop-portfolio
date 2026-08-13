@@ -1,16 +1,16 @@
 {
   "compilerOptions": {
-    "baseUrl": "src",
     "paths": {
-      "@styles": ["components/layout/styles"],
-      "@props": ["components/props.tsx"],
-      "@utils/*": ["utils/*"],
-      "@recoils/*": ["recoils/*"],
-      "@layout/*": ["components/layout/*"],
-      "@thirdparty/*": ["components/thirdparty/*"],
-      "@web/*": ["components/pages/web/*"],
-      "@mobile/*": ["components/pages/mobile/*"],
-      "@admin/*": ["components/pages/admin/*"]
+      "*": ["./src/*"],
+      "@styles": ["./src/components/layout/styles"],
+      "@props": ["./src/components/props.tsx"],
+      "@utils/*": ["./src/utils/*"],
+      "@recoils/*": ["./src/recoils/*"],
+      "@layout/*": ["./src/components/layout/*"],
+      "@thirdparty/*": ["./src/components/thirdparty/*"],
+      "@web/*": ["./src/components/pages/web/*"],
+      "@mobile/*": ["./src/components/pages/mobile/*"],
+      "@admin/*": ["./src/components/pages/admin/*"]
     }
   }
 }
