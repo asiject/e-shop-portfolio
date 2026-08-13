@@ -1,6 +1,5 @@
-import {useEffect, useState} from "react";
 import {useNavigate, Outlet, Link, NavLink} from "react-router-dom";
-import {useRecoilState, useRecoilValue} from "recoil";
+import {useRecoilState} from "recoil";
 import {isMobile} from "react-device-detect";
 
 import Box from "@mui/material/Box";
@@ -10,32 +9,24 @@ import PersonIcon from "@mui/icons-material/Person";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import LogoutIcon from "@mui/icons-material/Logout";
 
-import {getCategoryListQuery} from "@recoils/category/query";
-import {userState} from "@recoils/user/state";
-import {Styles} from "@styles";
+import {useCategoryListQuery} from "@recoils/category/query";
+import {isLoggedIn, userState} from "@recoils/user/state";
 import Loading from "./Loading";
 import Error from "./Error";
 import {postLogout} from "@recoils/login/axios";
+import {kraft} from "theme/kraft";
 
 export default function Gnb() {
-  const {isLoading, isError, data, error} = getCategoryListQuery();
-  const [list, setList] = useState([]);
+  const {isLoading, isError, data, error} = useCategoryListQuery();
+  const list: {id: string | number; title: string; type: string; action: string}[] = (data ?? []).map((c: any) => ({
+    id: c.id,
+    title: c.title,
+    type: c.type,
+    action: "/category/" + c.id,
+  }));
   const [loginUser, setLoginUser] = useRecoilState(userState);
-  const styles = Styles();
+  const loggedIn = isLoggedIn(loginUser);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (list?.length == 0) {
-      setList(
-        data?.map((c: any) => ({
-          id: c.id,
-          title: c.title,
-          type: c.type,
-          action: "/category/" + c.id,
-        })) || [],
-      );
-    }
-  }, [data]);
 
   if (isLoading) {
     return <Loading />;
@@ -43,6 +34,7 @@ export default function Gnb() {
   if (isError) {
     return <Error error={error} />;
   }
+
   const onLogout = async () => {
     await postLogout();
     setLoginUser(null);
@@ -52,76 +44,142 @@ export default function Gnb() {
 
   return (
     <>
-      <Box sx={styles.gnb}>
-        <Box sx={styles.srch}>
-          <Box sx={styles.logo}>
-            <Link to="/">
-              <Box component={"img"} src="/public/img/logo.jpg" />
-            </Link>
-          </Box>
-          <Box sx={styles.menubox}>
-            <Box component={"ul"} sx={styles.menulist}>
-              {list.map(({id, action, title}) => (
-                <Menu key={id} action={action} title={title} />
-              ))}
+      <Box
+        component="header"
+        sx={{
+          width: "100%",
+          minWidth: 1024,
+          fontFamily: kraft.sans,
+          a: {color: kraft.ink, textDecoration: "none"},
+        }}>
+        <Box
+          sx={{
+            width: 1024,
+            margin: "0 auto",
+            padding: "20px 0 12px",
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            flexWrap: "wrap",
+          }}>
+          <Box sx={{display: "flex", alignItems: "center", gap: 1.5}}>
+            <Box
+              component={Link}
+              to="/"
+              aria-label="1958SHOP 홈"
+              sx={{
+                backgroundColor: kraft.ink,
+                color: kraft.sticker,
+                "&&": {color: kraft.sticker},
+                fontFamily: kraft.display,
+                fontWeight: 700,
+                fontSize: 28,
+                letterSpacing: "0.04em",
+                lineHeight: 1,
+                padding: "6px 12px 4px",
+              }}>
+              1958SHOP
+            </Box>
+            <Box
+              aria-hidden="true"
+              sx={{
+                width: 56,
+                height: 56,
+                border: `3px solid ${kraft.stamp}`,
+                color: kraft.stamp,
+                borderRadius: "50%",
+                display: "grid",
+                placeItems: "center",
+                textAlign: "center",
+                fontFamily: kraft.mono,
+                fontSize: 9,
+                fontWeight: 600,
+                lineHeight: 1.15,
+                transform: "rotate(-12deg)",
+              }}>
+              LOT
+              <br />
+              1958
             </Box>
           </Box>
-          <Box sx={styles.rightbox}>
-            <Box sx={styles.topicon}>
-              {loginUser && loginUser.userid != 0 ? (
-                <Box sx={styles.iconbox}>
-                  <Link to="/order/list">
-                    <Box sx={styles.icon}>
-                      <PersonIcon />
-                    </Box>
-                  </Link>
-                </Box>
-              ) : (
-                <Box sx={styles.iconbox}>
-                  <Box sx={styles.icon}>
-                    <NavLink to="/login">로그인</NavLink>
-                  </Box>
-                </Box>
-              )}
-              <Box sx={styles.iconbox}>
-                <Box>
-                  <Link to="/cart/list">
-                    <Box sx={styles.icon}>
-                      <ShoppingCartIcon />
-                    </Box>
-                  </Link>
-                </Box>
+          <Box
+            component="nav"
+            aria-label="카테고리"
+            sx={{display: "flex", gap: 1, flex: 1, minWidth: 200}}>
+            {list.map(({id, action, title}) => (
+              <Box
+                key={id}
+                component={Link}
+                to={action}
+                sx={{
+                  backgroundColor: kraft.sticker,
+                  padding: "8px 14px 6px",
+                  fontWeight: 700,
+                  boxShadow: "2px 3px 0 rgba(26, 18, 11, 0.35)",
+                  clipPath: "polygon(4px 0, 100% 0, calc(100% - 5px) 100%, 0 100%)",
+                  "&:hover": {fontWeight: 800},
+                }}>
+                {title}
               </Box>
-              {loginUser && (
-                <Box sx={styles.iconbox}>
-                  <Box>
-                    <Box sx={styles.icon} onClick={onLogout}>
-                      <LogoutIcon />
-                    </Box>
-                  </Box>
-                </Box>
-              )}
+            ))}
+          </Box>
+          <Box sx={{display: "flex", alignItems: "center", gap: 1, marginLeft: "auto"}}>
+            {loggedIn ? (
+              <Box component={Link} to="/order/list" aria-label="주문 목록" sx={{display: "flex", color: kraft.ink}}>
+                <PersonIcon sx={{fontSize: 28}} />
+              </Box>
+            ) : (
+              <Box
+                component={NavLink}
+                to="/login"
+                sx={{
+                  backgroundColor: kraft.sticker,
+                  border: `1px solid ${kraft.ink}`,
+                  padding: "6px 10px",
+                  fontWeight: 700,
+                  fontSize: 14,
+                }}>
+                로그인
+              </Box>
+            )}
+            <Box component={Link} to="/cart/list" aria-label="장바구니" sx={{display: "flex", color: kraft.ink}}>
+              <ShoppingCartIcon sx={{fontSize: 28}} />
             </Box>
-            <Box sx={styles.srchbar}>
-              <TextField
-                sx={styles.srchInput}
-                InputProps={{
-                  endAdornment: <SearchIcon sx={{cursor: "pointer", color: "#9ac66d"}} />,
-                }}
-              />
-            </Box>
+            {loggedIn && (
+              <Box
+                component="button"
+                type="button"
+                onClick={onLogout}
+                aria-label="로그아웃"
+                sx={{
+                  display: "flex",
+                  background: "none",
+                  border: 0,
+                  padding: 0,
+                  cursor: "pointer",
+                  color: kraft.ink,
+                }}>
+                <LogoutIcon sx={{fontSize: 28}} />
+              </Box>
+            )}
+            <TextField
+              size="small"
+              placeholder="로트·원두 검색"
+              inputProps={{"aria-label": "검색"}}
+              sx={{
+                width: 160,
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: kraft.sticker,
+                },
+              }}
+              InputProps={{
+                endAdornment: <SearchIcon sx={{cursor: "pointer", color: kraft.ink}} />,
+              }}
+            />
           </Box>
         </Box>
       </Box>
       <Outlet />
     </>
-  );
-}
-function Menu({action, title}: {action: string; title: string}) {
-  const styles = Styles();
-  return (
-    <Box component={"li"} sx={styles.menu}>
-      <Link to={action}>{title}</Link>
-    </Box>
   );
 }
