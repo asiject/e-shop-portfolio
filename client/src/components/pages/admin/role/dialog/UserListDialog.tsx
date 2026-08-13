@@ -3,7 +3,7 @@ import Error from "@layout/Error";
 import Loading from "@layout/Loading";
 import {AppBar, Button, Dialog, IconButton, Slide, Toolbar, Typography} from "@mui/material";
 import {TransitionProps} from "@mui/material/transitions";
-import {getUserListQuery} from "@recoils/admin/user/query";
+import {useUserListQuery} from "@recoils/admin/user/query";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckedList from "../list/CheckedList";
 
@@ -18,10 +18,10 @@ const Transition = React.forwardRef(function Transition(
 
 export default function UserListDialog({initItems, open, setOpen, handleAddItems}: any) {
   const [selected, setSelected]: any = useState(initItems);
-  const {isLoading, isError, data, error} = getUserListQuery();
+  const {isLoading, isError, data, error} = useUserListQuery();
   useEffect(() => {
     setSelected(initItems);
-  }, [open]);
+  }, [open, initItems]);
   if (isLoading) {
     return <Loading />;
   }

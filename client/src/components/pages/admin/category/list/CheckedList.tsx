@@ -3,16 +3,20 @@ import NoData from "@web/common/NoData";
 import MenuIcon from "@mui/icons-material/Menu";
 import {useNavigate} from "react-router";
 import {arrayMove, SortableContainer, SortableContainerProps, SortableElement, SortableElementProps, SortableHandle} from "react-sortable-hoc";
-import {useState, useEffect} from "react";
+import {useState} from "react";
 import {putCategorySortno} from "@recoils/category/axios";
 
+const DragIcon = SortableHandle(() => (
+  <ListItemIcon>
+    <IconButton>
+      <MenuIcon />
+    </IconButton>
+  </ListItemIcon>
+));
+
 export default function CheckedList({list, selected, setSelected}: any) {
-  const [items, setItems] = useState([]);
-  useEffect(() => {
-    if (items?.length == 0 && list?.length != 0) {
-      setItems(list);
-    }
-  }, [list]);
+  // 한글 주석: list 동기화는 부모 key 리마운트에 위임 (effect로 전체 state reset 방지)
+  const [items, setItems] = useState(list ?? []);
 
   if (items?.length == 0) {
     return <NoData />;
@@ -36,13 +40,6 @@ const SortableItem: React.ComponentClass<SortableElementProps & {value: any; sel
   ({value, selected, setSelected}: {value: any; selected: any; setSelected: any}) => {
     const navigate = useNavigate();
 
-    const DragIcon = SortableHandle(() => (
-      <ListItemIcon>
-        <IconButton>
-          <MenuIcon />
-        </IconButton>
-      </ListItemIcon>
-    ));
     const handleView = (id: number) => {
       navigate(id);
     };

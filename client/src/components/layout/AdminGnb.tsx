@@ -10,12 +10,14 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import {useNavigate} from "react-router";
-import {getAdminMenuListQuery} from "@recoils/admin/menu/query";
+import {useAdminMenuListQuery} from "@recoils/admin/menu/query";
 import Loading from "./Loading";
 import Error from "./Error";
 import {Divider, FormControl, IconButton, MenuItem, Select, useMediaQuery} from "@mui/material";
-import {useRecoilState} from "recoil";
+import {useRecoilState, useSetRecoilState} from "recoil";
 import {localeState} from "@recoils/admin/menu/state";
+import {userState} from "@recoils/user/state";
+import {postLogout} from "@recoils/login/axios";
 import {FormattedMessage, useIntl} from "react-intl";
 import MenuIcon from "@mui/icons-material/Menu";
 
@@ -24,10 +26,12 @@ const standard = "(max-width: 1024px)";
 
 export default function AdminGnb({RightButtons, children}: any) {
   const [locale, setLocale] = useRecoilState(localeState);
+  const setLoginUser = useSetRecoilState(userState);
+  const navigate = useNavigate();
   const isMobile = useMediaQuery(standard);
   const [open, setOpen] = React.useState(false);
   const {formatMessage} = useIntl();
-  const {isLoading, isError, data, error} = getAdminMenuListQuery();
+  const {isLoading, isError, data, error} = useAdminMenuListQuery();
   if (isLoading) {
     return <Loading />;
   }
@@ -41,6 +45,14 @@ export default function AdminGnb({RightButtons, children}: any) {
     } = e;
     setLocale(value);
   };
+
+  const handleLogout = async () => {
+    await postLogout();
+    setLoginUser(null);
+    alert("로그아웃 되었습니다");
+    navigate("/admin");
+  };
+
   return (
     <Box sx={{display: "flex"}}>
       <CssBaseline />
@@ -74,7 +86,7 @@ export default function AdminGnb({RightButtons, children}: any) {
               </Select>
             </FormControl>
             <ListItem key={"logout"} disablePadding>
-              <ListItemButton>
+              <ListItemButton onClick={handleLogout}>
                 <ListItemText primary={formatMessage({id: "logout"})} />
               </ListItemButton>
             </ListItem>
@@ -125,7 +137,7 @@ function MenuList({data}: any) {
 
   return data?.map(({id, title, url, useyn}: any) => {
     if (useyn == "Y") {
-      return <Menu key={id} id={id} title={<FormattedMessage id={title} />} url={url} onPageMove={onPageMove} />;
+      return <Menu key={id} id={id} title={<FormattedMessage id={title} defaultMessage={title} />} url={url} onPageMove={onPageMove} />;
     }
   });
 }
