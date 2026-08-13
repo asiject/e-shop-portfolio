@@ -7,6 +7,10 @@ import {userState} from "@recoils/user/state";
 import {useNavigate} from "react-router";
 import {getGoogleInfoAxios, getToken} from "@recoils/login/axios";
 
+const handleLoginError = (errorResponse: any) => {
+  console.error(errorResponse);
+};
+
 export default function GoogleLoginButton() {
   const setLoginAuth = useSetRecoilState(loginAuthState);
   const setUser = useSetRecoilState(userState);
@@ -36,10 +40,6 @@ export default function GoogleLoginButton() {
     2. storage  access_token, refresh_token
     3. cookie access_token, refresh_token
   */
-
-  const handleLoginError = (errorResponse: any) => {
-    console.error(errorResponse);
-  };
 
   const googleSocialLogin = useGoogleLogin({
     scope: "email profile",
