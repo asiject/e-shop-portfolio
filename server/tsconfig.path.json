@@ -1,25 +1,25 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
-      "@config/*": ["config/*"],
-      "@lib/*": ["src/lib/*"],
-      "@routes/*": ["src/routes/*"],
-      "@api/*": ["src/routes/api/*"],
-      "@utils/*": ["src/utils/*"],
-      "@error/*": ["src/error/*"],
-      "@common/*": ["src/app/common/*"],
-      "@admin/*": ["src/app/admin/*"],
-      "@cart/*": ["src/app/cart/*"],
-      "@category/*": ["src/app/category/*"],
-      "@file/*": ["src/app/file/*"],
-      "@menu/*": ["src/app/menu/*"],
-      "@order/*": ["src/app/order/*"],
-      "@policy/*": ["src/app/policy/*"],
-      "@product/*": ["src/app/product/*"],
-      "@role/*": ["src/app/role/*"],
-      "@user/*": ["src/app/user/*"],
-      "@props": ["src/props.ts"]
+      "*": ["./*"],
+      "@config/*": ["./config/*"],
+      "@lib/*": ["./src/lib/*"],
+      "@routes/*": ["./src/routes/*"],
+      "@api/*": ["./src/routes/api/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@error/*": ["./src/error/*"],
+      "@common/*": ["./src/app/common/*"],
+      "@admin/*": ["./src/app/admin/*"],
+      "@cart/*": ["./src/app/cart/*"],
+      "@category/*": ["./src/app/category/*"],
+      "@file/*": ["./src/app/file/*"],
+      "@menu/*": ["./src/app/menu/*"],
+      "@order/*": ["./src/app/order/*"],
+      "@policy/*": ["./src/app/policy/*"],
+      "@product/*": ["./src/app/product/*"],
+      "@role/*": ["./src/app/role/*"],
+      "@user/*": ["./src/app/user/*"],
+      "@props": ["./src/props.ts"]
     }
   }
 }
