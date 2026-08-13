@@ -1,10 +1,11 @@
 import {Box, Button} from "@mui/material";
 import {MStyles} from "@styles";
 
+const onMove = (id: string) => {
+  document.getElementById(id)!.scrollIntoView({behavior: "smooth"});
+};
+
 export default function ContentMenubar() {
-  const onMove = (id: string) => {
-    document.getElementById(id)!.scrollIntoView({behavior: "smooth"});
-  };
   return (
     <Box component={"ul"} sx={MStyles.contentMenubar}>
       <Box component={"li"}>

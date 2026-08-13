@@ -6,7 +6,7 @@ import axios from "axios";
 import {Box, Button, Checkbox, TextField, FormControl, FormControlLabel} from "@mui/material";
 
 import {userState} from "@recoils/user/state";
-import {getCartListQuery} from "@recoils/cart/query";
+import {useCartListQuery} from "@recoils/cart/query";
 import {execute} from "@utils/Executor";
 import {numberFormat} from "@utils/Numaric";
 import {MStyles} from "@styles";
@@ -23,52 +23,40 @@ export default function MCartList() {
     ? window.location.protocol + "//" + window.location.hostname + ":" + window.location.port
     : window.location.protocol + "//" + window.location.hostname;
   const loginUser = useRecoilValue(userState);
-  const {isLoading, isError, data, error} = getCartListQuery(loginUser?.userid);
+  const {isLoading, isError, data, error} = useCartListQuery(loginUser?.userid);
 
   useEffect(() => {
-    if (loginUser) {
-      if (data) {
-        cartListFunc(data);
-      }
-    } else {
+    if (!loginUser) {
       navigate("/m/login");
+      return;
     }
-  }, [data]);
+    if (!data) return;
+    const mapped = data.map((item: any) => ({
+      id: item.id,
+      userid: item.userid,
+      productid: item.product.id,
+      pid: item.pid,
+      itemid: item.itemid,
+      thumbnail: String(host + item.product.thumbnail),
+      maxCapacity: Number(item.product.capacity),
+      title: item.product.title,
+      option: item.option,
+      count: Number(item.count),
+      cost: Number(item.cost),
+      isChecked: true,
+    }));
+    setItemList(mapped);
+    setSelectItems(mapped);
+    setTotalCost(mapped.reduce((sum: number, item: any) => sum + item.count * item.cost, 0));
+  }, [data, host, loginUser, navigate]);
 
-  useEffect(() => {
-    if (itemList.length > 0) {
-      changeAllCheckBox(true);
-    }
-  }, [itemList]);
-  async function cartListFunc(data: any) {
-    const result = data;
-    setItemList(
-      result.map((item: any) => {
-        // console.log("item data : ", item);
-        return {
-          id: item.id,
-          userid: item.userid,
-          productid: item.product.id,
-          pid: item.pid,
-          itemid: item.itemid,
-          thumbnail: String(host + item.product.thumbnail),
-          maxCapacity: Number(item.product.capacity),
-          title: item.product.title,
-          option: item.option,
-          count: Number(item.count),
-          cost: Number(item.cost),
-          isChecked: true,
-        };
-      }),
-    );
-  }
   const changeCheckbox = (checked: boolean, item: any, cost: number) => {
     if (checked) {
-      setSelectItems([...selectItems, item]);
-      setTotalCost(totalCost + cost);
+      setSelectItems(prev => [...prev, item]);
+      setTotalCost(prev => prev + cost);
     } else {
-      setSelectItems(selectItems.filter((selectItem: any) => selectItem.id !== item.id));
-      setTotalCost(totalCost - cost);
+      setSelectItems(prev => prev.filter((selectItem: any) => selectItem.id !== item.id));
+      setTotalCost(prev => prev - cost);
     }
   };
   const changeAllCheckBox = (checked: boolean) => {
@@ -79,8 +67,8 @@ export default function MCartList() {
       itemList.map((item: any) => {
         itemArray.push(item);
         tempCost += item.count * item.cost;
-        setTotalCost(tempCost);
       });
+      setTotalCost(tempCost);
       setSelectItems(itemArray);
     } else {
       setSelectItems([]);
@@ -151,12 +139,10 @@ export default function MCartList() {
               </Box>
             </Box>
             {itemList &&
-              itemList.map((item, i) => {
+              itemList.map((item: any) => {
                 return (
                   <ListItem
-                    key={i}
-                    index={i}
-                    itemList={itemList}
+                    key={item.id}
                     item={item}
                     selectItems={selectItems}
                     changeCheckbox={changeCheckbox}
@@ -206,9 +192,10 @@ export default function MCartList() {
   );
 }
 
-function ListItem({index, item, selectItems, changeCheckbox, handleEditCart}: any) {
-  // console.log("item >> ", item);
-  const [count, setCount] = useState(item.count);
+function ListItem({item, selectItems, changeCheckbox, handleEditCart}: any) {
+  // 한글 주석: item.count를 단일 소스로 두고, 리렌더만 tick으로 유도
+  const [, setTick] = useState(0);
+  const count = item.count;
   const {cost, itemid, option, prouctid, thumbnail, title} = item;
   return (
     <Box sx={MStyles.MCartCardBox}>
@@ -234,9 +221,9 @@ function ListItem({index, item, selectItems, changeCheckbox, handleEditCart}: an
                 <Button
                   sx={MStyles.MCartStockButton}
                   onClick={() => {
-                    if (count > 1) {
+                    if (item.count > 1) {
                       item.count--;
-                      setCount(count - 1);
+                      setTick(t => t + 1);
                     }
                   }}>
                   -
@@ -245,13 +232,14 @@ function ListItem({index, item, selectItems, changeCheckbox, handleEditCart}: an
                 <Button
                   sx={MStyles.MCartStockButton}
                   onClick={() => {
-                    if (count < item.maxCapacity) {
+                    if (item.count < item.maxCapacity) {
                       item.count++;
-                      setCount(count + 1);
+                      setTick(t => t + 1);
                     }
                     if (item.count > 10000) {
                       alert("1만개 이하만 주문할 수 있습니다");
                       item.count = 10000;
+                      setTick(t => t + 1);
                     }
                   }}>
                   +
@@ -266,7 +254,7 @@ function ListItem({index, item, selectItems, changeCheckbox, handleEditCart}: an
               color="info"
               onClick={e => {
                 const data = {userid: item.userid, pid: item.pid, itemid: item.itemid, count: item.count};
-                handleEditCart(item.userid, data, index);
+                handleEditCart(item.userid, data);
               }}>
               수량 변경
             </Button>

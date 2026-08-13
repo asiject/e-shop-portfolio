@@ -23,15 +23,21 @@ export default function MProductDetail({
   setSelectList,
   packageMethod,
   setPackageMethod,
-  totalCost,
-  setTotalCost,
-  totalStock,
-  setTotalStock,
   tabYn,
 }: any) {
   const navigate = useNavigate();
   const [selectFair, setSelectFair] = useState([]);
   const user = useRecoilValue(userState);
+
+  // selectList 기준 총액/총수량 (옵션 없으면 product 기본값)
+  const totalStock =
+    selectList.length > 0 ? selectList.reduce((sum: number, item: any) => sum + item.stock, 0) : optLen > 0 ? 0 : product.stock || 1;
+  const totalCost =
+    selectList.length > 0
+      ? selectList.reduce((sum: number, item: any) => sum + item.cost * item.stock, 0)
+      : optLen > 0
+        ? 0
+        : product.cost * (product.stock || 1);
 
   const handleAddCart = async (product: any) => {
     console.log("data >>", product);
@@ -77,9 +83,8 @@ export default function MProductDetail({
             const opt = optionList.filter((opt: any) => opt.key == optkey);
             const optval = opt[0].val.split(",");
             return (
-              <Box key={i}>
+              <Box key={optkey}>
                 <Options
-                  key={i}
                   seq={i + 1}
                   optLen={optLen}
                   optkey={optkey}
@@ -89,10 +94,6 @@ export default function MProductDetail({
                   setSelectFair={setSelectFair}
                   selectList={selectList}
                   setSelectList={setSelectList}
-                  totalCost={totalCost}
-                  setTotalCost={setTotalCost}
-                  totalStock={totalStock}
-                  setTotalStock={setTotalStock}
                 />
               </Box>
             );
@@ -105,16 +106,12 @@ export default function MProductDetail({
               const itemInfo = itemList.filter((item: any) => item.val == selectItem.val)[0];
               return (
                 <Item
-                  key={i}
+                  key={selectItem.itemid ?? selectItem.val}
                   seq={i}
                   optLen={optLen}
                   itemInfo={itemInfo}
                   selectList={selectList}
                   setSelectList={setSelectList}
-                  totalCost={totalCost}
-                  setTotalCost={setTotalCost}
-                  totalStock={totalStock}
-                  setTotalStock={setTotalStock}
                 />
               );
             })
@@ -125,10 +122,6 @@ export default function MProductDetail({
               itemInfo={product}
               selectList={selectList}
               setSelectList={setSelectList}
-              totalCost={totalCost}
-              setTotalCost={setTotalCost}
-              totalStock={totalStock}
-              setTotalStock={setTotalStock}
             />
           )}
         </Box>
@@ -186,24 +179,24 @@ export default function MProductDetail({
               onClick={async () => {
                 console.log("user >", user, optLen, selectList);
                 if (user) {
-                  let data = {};
                   if (optLen > 0) {
                     // console.log("장바구니 옵션 있음 : ", product, selectList);
-                    selectList?.map(async (item: any) => {
-                      data = {
-                        userid: user.userid,
-                        productid: product.id,
-                        pid: product.id,
-                        itemid: item.itemid,
-                        option: item.val,
-                        count: item.stock,
-                        cost: item.cost,
-                      };
-                      await handleAddCart(data);
-                    });
+                    await Promise.all(
+                      selectList.map((item: any) =>
+                        handleAddCart({
+                          userid: user.userid,
+                          productid: product.id,
+                          pid: product.id,
+                          itemid: item.itemid,
+                          option: item.val,
+                          count: item.stock,
+                          cost: item.cost,
+                        }),
+                      ),
+                    );
                   } else {
                     // console.log("장바구니 옵션 없음 : ", product);
-                    data = {
+                    await handleAddCart({
                       userid: user.userid,
                       productid: product.id,
                       pid: product.id,
@@ -211,8 +204,7 @@ export default function MProductDetail({
                       option: "",
                       count: product.stock,
                       cost: product.cost,
-                    };
-                    await handleAddCart(data);
+                    });
                   }
                 } else if (confirm("로그인 후 이용이 가능합니다.\n로그인하시겠습니까?")) {
                   navigate("/login");

@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useRecoilState, useRecoilValue} from "recoil";
 import {useParams, useNavigate} from "react-router-dom";
 
 import {Box, Button, Table, TableBody, TableCell, TableRow} from "@mui/material";
 
 import {userState} from "@recoils/user/state";
-import {getOrderSheetResultQuery} from "@recoils/order/query";
+import {useOrderSheetResultQuery} from "@recoils/order/query";
 import {numberFormat} from "@utils/Numaric";
 import {MStyles} from "@styles";
 
@@ -14,10 +14,10 @@ export default function MOrderSheetResult() {
   // TODO: pay일 경우 query로 간사이름(장부명), 간사번호(장부번호) 받아와야함
   // const [] = useRecoilState()
   const [productList, setProductList] = useState([]);
-  const [result, setResult] = useState(null);
+  const resultRef = useRef<any>(null);
   const navigate = useNavigate();
   const loginUser = useRecoilValue(userState);
-  const {isLoading, isError, data, error} = getOrderSheetResultQuery({userid: loginUser?.userid, orderid: id || ""});
+  const {isLoading, isError, data, error} = useOrderSheetResultQuery({userid: loginUser?.userid, orderid: id || ""});
 
   useEffect(() => {
     if (loginUser) {
@@ -27,14 +27,14 @@ export default function MOrderSheetResult() {
     } else {
       navigate("/login");
     }
-  }, [data]);
+  }, [data, loginUser, navigate]);
   const orderSheetResultFunc = async (data: any) => {
     const params = {userid: loginUser.userid, orderid: id};
     // console.log("orderSheet Result : ", result);
     const {products, payment, buyer, delivery} = data;
     console.log("result : ", products, payment, buyer, delivery);
     setProductList(products);
-    setResult(data);
+    resultRef.current = data;
     // TODO: THINKING POINT => STATUS 가 TEMP 가 아닌 것(결제 대기, 결제 완료, 혹은 그 이후 스탭)이면 orderSheetList? Query로 받아와도 되지 않을까? 쿼리 결과 확인하고 원하는 결과물이 나오면 해당 결과물 가져오기
   };
 
@@ -58,8 +58,8 @@ export default function MOrderSheetResult() {
         <Box sx={MStyles.MOrderResultBox}>
           <Box>주문내역</Box>
           {productList &&
-            productList.map((item, i) => {
-              return <ListItem key={i} item={item} />;
+            productList.map(item => {
+              return <ListItem key={`${item.productid}-${item.itemid}`} item={item} />;
             })}
         </Box>
         {/*  */}

@@ -1,27 +1,21 @@
-import React, {useEffect} from "react";
+import React from "react";
 import {Box, Button, TextField} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import {numberFormat} from "@utils/Numaric";
 
-export default function Item({seq, optLen, itemInfo, selectList, setSelectList, totalCost, setTotalCost, totalStock, setTotalStock}: any) {
+export default function Item({seq, optLen, itemInfo, selectList, setSelectList}: any) {
   const selectItem = selectList.length > 0 ? selectList[seq] : itemInfo;
-  // console.log("itemInfo >> ", itemInfo);
-  useEffect(() => {
-    if (selectList && selectList[seq]) {
-      let TCost = selectList.map((s: any) => s.cost * s.stock).reduce((prevCost: number, nextCost: number) => prevCost + nextCost);
-      let TStock = selectList.map((s: any) => s.stock).reduce((prevStock: number, nextStock: number) => prevStock + nextStock);
-      // console.log("T Cost, Stock : ", TCost, TStock);
-      setTotalCost(TCost);
-      setTotalStock(TStock);
+
+  const updateStock = (nextStock: number) => {
+    if (optLen > 0) {
+      setSelectList(selectList.map((s: any, i: number) => (i === seq ? {...s, stock: nextStock} : s)));
+      return;
     }
-    // }, [totalStock]);
-  }, [selectItem.stock]);
-  useEffect(() => {
-    if (optLen == 0 && selectItem) {
-      setTotalStock(selectItem.stock);
-      setTotalCost(selectItem.cost);
-    }
-  }, []);
+    // 옵션 없는 상품: selectList에 단일 항목으로 동기화 (부모에서 totals 도출)
+    setSelectList([{itemid: 0, val: "", cost: itemInfo.cost, stock: nextStock}]);
+    itemInfo.stock = nextStock;
+  };
+
   return (
     <Box component={"li"} sx={{borderBottom: "1px solid #ccc", padding: "10px 0"}}>
       <Box>{itemInfo.val}</Box>
@@ -38,13 +32,7 @@ export default function Item({seq, optLen, itemInfo, selectList, setSelectList, 
               }}
               onClick={() => {
                 if (selectItem.stock > 1) {
-                  setTotalStock(totalStock - 1);
-                  setTotalCost(totalCost - itemInfo.cost);
-                  selectItem.stock--;
-                }
-                if (selectItem.stock > 10000) {
-                  alert("1만개 이하만 주문할 수 있습니다");
-                  selectItem.stock = 10000;
+                  updateStock(selectItem.stock - 1);
                 }
               }}>
               -
@@ -79,7 +67,7 @@ export default function Item({seq, optLen, itemInfo, selectList, setSelectList, 
                 // const check = /^[0-9]+$/;
                 // selectList[seq].stock = !check.test(text);
                 // selectList[seq].stock = text?.replaceAll(/a-zA-Z/gi, "");
-                // setValue(text?.replaceAll(/a-zA-Z/gi, ""));
+                // setValue(text?.replaceAll(/a-zA-Z/gi, "");
               }}></Box> */}
             <Button
               style={{
@@ -91,13 +79,12 @@ export default function Item({seq, optLen, itemInfo, selectList, setSelectList, 
               }}
               onClick={() => {
                 if (selectItem.stock < itemInfo.capacity) {
-                  setTotalStock(totalStock + 1);
-                  setTotalCost(totalCost + itemInfo.cost);
-                  selectItem.stock++;
-                }
-                if (selectItem.stock > 10000) {
-                  alert("1만개 이하만 주문할 수 있습니다");
-                  selectItem.stock = 10000;
+                  let next = selectItem.stock + 1;
+                  if (next > 10000) {
+                    alert("1만개 이하만 주문할 수 있습니다");
+                    next = 10000;
+                  }
+                  updateStock(next);
                 }
               }}>
               +
@@ -119,9 +106,7 @@ export default function Item({seq, optLen, itemInfo, selectList, setSelectList, 
                   "&.hover": {cursor: "pointer"},
                 }}
                 onClick={() => {
-                  setTotalCost(totalCost - selectItem.stock * itemInfo.cost);
-                  setTotalStock(totalStock - selectItem.stock);
-                  setSelectList(selectList?.filter((s: any) => s.key != itemInfo.key));
+                  setSelectList(selectList?.filter((s: any) => s.val != itemInfo.val));
                 }}
               />
             )}

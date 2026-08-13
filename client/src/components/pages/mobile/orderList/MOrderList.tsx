@@ -8,7 +8,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import AddIcon from "@mui/icons-material/Add";
 
 import {userState} from "@recoils/user/state";
-import {getOrderListQuery} from "@recoils/order/query";
+import {useOrderListQuery} from "@recoils/order/query";
 import {numberFormat} from "@utils/Numaric";
 import {execute} from "@utils/Executor";
 import dateFormat from "@utils/DateFormat";
@@ -18,11 +18,11 @@ import Error from "@layout/Error";
 import {MStyles} from "@styles";
 
 export default function MOrderList() {
-  // const [getOrderListQuery, setOrderListQuery] = useRecoilState(orderListQuery);
+  // const [useOrderListQuery, setOrderListQuery] = useRecoilState(orderListQuery);
   const [orderList, setOrderList] = useState([]);
   const loginUser = useRecoilValue(userState);
   const navigate = useNavigate();
-  const {isLoading, isError, data, error} = getOrderListQuery({userid: loginUser?.userid});
+  const {isLoading, isError, data, error} = useOrderListQuery({userid: loginUser?.userid});
   useEffect(() => {
     if (loginUser) {
       if (data) {
@@ -31,7 +31,7 @@ export default function MOrderList() {
     } else {
       navigate("/login");
     }
-  }, [data]);
+  }, [data, loginUser, navigate]);
 
   if (isLoading) {
     return <Loading />;
@@ -51,7 +51,7 @@ export default function MOrderList() {
       <Box sx={MStyles.orderSheet}>
         <Box component={"h1"}>주문목록</Box>
         {/* 클릭하면 /order/:id 로 이동  */}
-        {orderList && orderList.map((item, i) => <ListItem key={i} item={item} handleShowDetail={handleShowDetail} />)}
+        {orderList && orderList.map(item => <ListItem key={item.orderid} item={item} handleShowDetail={handleShowDetail} />)}
         <Box sx={MStyles.MOrderListAddButton}>
           <AddIcon />
           더보기
@@ -77,7 +77,7 @@ function ListItem({item, handleShowDetail}: any) {
         </Box>
         {/* <Box>주문번호 : 1234-5678</Box> */}
       </Box>
-      {products && products.map((product: any, index: number) => <IndividualProduct key={index} product={product} />)}
+      {products && products.map((product: any) => <IndividualProduct key={`${product.productid}-${product.itemid}`} product={product} />)}
       <Box sx={{padding: "12px 0"}}>
         <Button
           sx={MStyles.w100per}

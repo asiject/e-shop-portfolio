@@ -1,7 +1,6 @@
 import axios from "axios";
 import {api} from "@recoils/common";
 export const getProductList = () => api.get(`/product`);
-export const getNewProductList = () => api.get(`/product/new`);
 export const getProduct = (productid: string) => {
   return api.get(`/product/${productid}`);
 };

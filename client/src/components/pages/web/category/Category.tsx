@@ -1,36 +1,45 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {useParams} from "react-router-dom";
 import {Box} from "@mui/material";
-import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import GridViewIcon from "@mui/icons-material/GridView";
 import GalleryView from "./GalleryView";
 import ListView from "./ListView";
-import {getProductListByCategoryidQuery} from "@recoils/product/query";
-import Loading from "@layout/Loading";
+import {useProductListByCategoryidQuery} from "@recoils/product/query";
 import Error from "@layout/Error";
+import ProductListSkeleton from "@layout/ProductListSkeleton";
+import NoData from "@web/common/NoData";
 import {Styles} from "@styles";
+
+const SKELETON_COUNT = 4;
+
 export default function Category() {
   const [listView, setListView] = useState("gallery");
   const {id} = useParams();
-  const {isLoading, isError, data, error} = getProductListByCategoryidQuery(Number(id));
+  const {isLoading, isError, data, error} = useProductListByCategoryidQuery(Number(id));
   const styles = Styles();
-  if (isLoading) {
-    return <Loading />;
-  }
+
   if (isError) {
     return <Error error={error} />;
   }
+
+  const isEmpty = !isLoading && (!data || data.length === 0);
+
   return (
     <Box sx={styles.container}>
       <Box sx={styles.categoryBox}>
-        <Box sx={styles.categoryTitle}>{data && data[0]?.category.title}</Box>
+        <Box component="h1" sx={styles.categoryTitle}>
+          {data && data[0]?.category.title}
+        </Box>
       </Box>
-      {/* 일단보존 <Box sx={{ marginTop: "30px", fontSize: "13px", display: "flex" }}>
-        <SortArea sort={sort} setSort={setSort} />
-        <RightArea setListView={setListView} />
-      </Box> */}
-      <ContentArea listView={listView} data={data} />
-      {/* <Paging /> */}
+      {isLoading ? (
+        <ProductListSkeleton count={SKELETON_COUNT} variant="web" />
+      ) : isEmpty ? (
+        <>
+          <ProductListSkeleton count={SKELETON_COUNT} variant="web" />
+          <NoData />
+        </>
+      ) : (
+        <ContentArea listView={listView} data={data} />
+      )}
     </Box>
   );
 }

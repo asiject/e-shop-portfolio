@@ -6,7 +6,7 @@ import {useRecoilState} from "recoil";
 
 import {Box, Button} from "@mui/material";
 
-import {getProductQuery} from "@recoils/product/query";
+import {useProductQuery} from "@recoils/product/query";
 import {Styles} from "@styles";
 import ContentMenubar from "./ContentMenubar";
 import Qna from "./Qna";
@@ -27,8 +27,6 @@ export default function Product() {
   const [optLen, setOptLen] = useState(0);
   const [selectList, setSelectList] = useState([]);
   const [packageMethod, setPackageMethod] = useState("");
-  const [totalStock, setTotalStock] = useState(0);
-  const [totalCost, setTotalCost] = useState(0);
   const productTabContainer = useRef<HTMLElement>();
   const detailPage = useRef<HTMLElement>();
   const showEasyToBuy = useRef<HTMLElement>();
@@ -37,7 +35,7 @@ export default function Product() {
   const navigate = useNavigate();
   const styles = Styles();
 
-  const {isLoading, isError, data, error} = getProductQuery(productid || "", {
+  const {isLoading, isError, data, error} = useProductQuery(productid || "", {
     retry: 0,
     refetchOnWindowFocus: false,
     onSuccess: async (result: any) => {
@@ -181,10 +179,6 @@ export default function Product() {
             setSelectList={setSelectList}
             packageMethod={packageMethod}
             setPackageMethod={setPackageMethod}
-            totalCost={totalCost}
-            setTotalCost={setTotalCost}
-            totalStock={totalStock}
-            setTotalStock={setTotalStock}
             tabYn={false}
           />
         )}
@@ -242,10 +236,6 @@ export default function Product() {
                 setSelectList={setSelectList}
                 packageMethod={packageMethod}
                 setPackageMethod={setPackageMethod}
-                totalCost={totalCost}
-                setTotalCost={setTotalCost}
-                totalStock={totalStock}
-                setTotalStock={setTotalStock}
                 tabYn={"Y"}
               />
             )}

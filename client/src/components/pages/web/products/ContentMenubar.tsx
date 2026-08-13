@@ -1,12 +1,14 @@
 import {Box, Button} from "@mui/material";
 import {Styles} from "@styles";
+
+const onMove = (id: string) => {
+  let offsetPosition = document.getElementById(id)!.getBoundingClientRect().top + window.pageYOffset - 115;
+  // 115 = offset(height) = contentMenubar + (scrolled) productDetail
+  window.scrollTo({top: offsetPosition, behavior: "smooth"});
+};
+
 export default function ContentMenubar() {
   const styles = Styles();
-  const onMove = (id: string) => {
-    let offsetPosition = document.getElementById(id)!.getBoundingClientRect().top + window.pageYOffset - 115;
-    // 115 = offset(height) = contentMenubar + (scrolled) productDetail
-    window.scrollTo({top: offsetPosition, behavior: "smooth"});
-  };
   return (
     <Box component={"ul"} sx={styles.contentMenubar}>
       <Box component={"li"}>
