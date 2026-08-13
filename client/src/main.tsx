@@ -10,7 +10,6 @@ import App from "./App";
 import {RecoilRoot, useRecoilValue} from "recoil";
 import {localeState} from "@recoils/admin/menu/state";
 import {ko, en} from "./locales";
-import {userState} from "@recoils/user/state";
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const theme = createTheme({
   palette: {
@@ -21,10 +20,9 @@ const theme = createTheme({
   },
 });
 const queryClient = new QueryClient();
+const locales: any = {ko, en};
 function Init() {
   const locale = useRecoilValue(localeState);
-
-  const locales: any = {ko, en};
   const messages = locales[locale];
   return (
     <GoogleOAuthProvider clientId={clientId}>

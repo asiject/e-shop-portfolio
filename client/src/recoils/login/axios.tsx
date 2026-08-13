@@ -11,3 +11,5 @@ export async function getToken({userid, ssoid}: {userid: string; ssoid: string})
 export const postRegister = async (data: FormData) => api.post("/user/register", data);
 
 export const postLogout = () => server.post("/auth/logout");
+
+export const postDemoLogin = (role: "USER" | "ADMIN") => server.post("/auth/demo", {role});
