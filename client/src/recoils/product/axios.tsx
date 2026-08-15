@@ -6,8 +6,6 @@ export const getProduct = (productid: string) => {
 };
 export const getProductQna = (productid: string | number) => api.get(`/product/${productid}/qna`);
 export const postProductQna = (productid: string | number, body: {
-  userid: string;
-  username?: string;
   kind: string;
   body: string;
   orderid?: string;

@@ -12,12 +12,9 @@ import {isProductQnaKind, PRODUCT_QNA_KIND_LABEL, type ProductQnaKind} from "@ut
 
 type ProductQnaRow = {
   id: number;
-  userid: string;
-  username?: string;
   kind: ProductQnaKind;
   body: string;
   answer?: string;
-  orderid?: string;
   createdate: string;
 };
 
@@ -86,8 +83,6 @@ export default function ProductQna({id, productId}: ProductQnaProps) {
     setSaving(true);
     try {
       await postProductQna(productId, {
-        userid: String(user.userid),
-        username: user.username,
         kind,
         body: body.trim(),
         orderid: queryOrderid || undefined,
@@ -143,7 +138,6 @@ export default function ProductQna({id, productId}: ProductQnaProps) {
               }}>
               <Box sx={{fontFamily: kraft.mono, fontSize: 11, letterSpacing: "0.08em", color: kraft.mute}}>
                 {PRODUCT_QNA_KIND_LABEL[row.kind]}
-                {row.orderid ? ` · 주문 ${row.orderid}` : ""}
               </Box>
               <Box sx={{mt: 0.5, fontSize: 14, whiteSpace: "pre-wrap"}}>{row.body}</Box>
               {row.answer ? (

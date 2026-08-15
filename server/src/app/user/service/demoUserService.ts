@@ -84,7 +84,9 @@ export async function ensureDemoUser(role: DemoLoginRole): Promise<{login: UserL
 }
 
 export function isDemoLoginEnabled() {
+  // 한글 주석: production은 플래그와 무관하게 차단. 로컬/dev만 기본 허용
+  if (process.env.NODE_ENV === "production") return false;
   if (process.env.ENABLE_DEMO_LOGIN === "true") return true;
   if (process.env.ENABLE_DEMO_LOGIN === "false") return false;
-  return process.env.NODE_ENV !== "production";
+  return true;
 }

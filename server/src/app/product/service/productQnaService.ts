@@ -8,6 +8,26 @@ export function parseQnaKind(value: string | undefined): ProductQnaKind | null {
   return KINDS.includes(value as ProductQnaKind) ? (value as ProductQnaKind) : null;
 }
 
+export type PublicProductQna = {
+  id: number;
+  kind: ProductQnaKind;
+  body: string;
+  answer: string | null;
+  createdate: Date;
+  answeredat: Date | null;
+};
+
+export function toPublicProductQna(row: ProductQna): PublicProductQna {
+  return {
+    id: row.id,
+    kind: row.kind,
+    body: row.body,
+    answer: row.answer ?? null,
+    createdate: row.createdate,
+    answeredat: row.answeredat ?? null,
+  };
+}
+
 export async function getProductQnas(productid: number): Promise<ProductQna[]> {
   return await ProductQna.find({
     where: {productid},

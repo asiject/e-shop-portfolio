@@ -53,10 +53,15 @@ export default async function (fastify: FastifyInstance) {
       return reply.code(400).send({message: "NO_FILE"});
     }
     const fileid = uuid();
-    const imgRoot = path.join("public", "product", "images");
+    const imgRoot = path.resolve("public", "product", "images");
     fs.mkdirSync(imgRoot, {recursive: true});
-    const filename = `${fileid}_${file.filename}`;
-    await pump(file.file, fs.createWriteStream(path.join(imgRoot, filename)));
+    const rawName = path.basename(file.filename || "image").replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 80) || "image";
+    const filename = `${fileid}_${rawName}`;
+    const dest = path.resolve(imgRoot, filename);
+    if (dest !== imgRoot && !dest.startsWith(imgRoot + path.sep)) {
+      return reply.code(400).send({message: "INVALID_FILENAME"});
+    }
+    await pump(file.file, fs.createWriteStream(dest));
     reply.send({path: `/product/images/${filename}`});
   });
 
@@ -70,6 +75,7 @@ export default async function (fastify: FastifyInstance) {
     optionCnt?: number;
     showyn?: string;
     editor?: string;
+    images?: string[];
   }}>, reply: FastifyReply) => {
     const result: UpdateResult = await editProduct(req.body);
     reply.send(result);

@@ -27,14 +27,14 @@
 - 크라프트 로트 UI: 포장대·로트 스티커가 상품 카드. 로고 `/public/img/logo.webp`
 
 ### 인증
-- 데모 로그인(개발/소개용): 일반 유저 / 관리자 원클릭. 운영에서는 `ENABLE_DEMO_LOGIN=false` 및 `VITE_ENABLE_DEMO_LOGIN=false`
+- 데모 로그인(개발/소개용): 일반 유저 / 관리자 원클릭. `NODE_ENV=production`이면 서버가 `/auth/demo`를 항상 404. 로컬은 `ENABLE_DEMO_LOGIN=false`로 끌 수 있음. 버튼은 `VITE_ENABLE_DEMO_LOGIN`
 - Google OAuth 코드는 남아 있으나 클라이언트 ID가 없어 버튼은 비활성. 복구하지 않음
 
 ### 관리자 (`/admin`, `isAdmin`)
 - 큐 작업대 셸(`adminWorkbench`): 상단 IA + 좌측 큐. 스토어 크라프트와 섞지 않음
 - 대시보드, 역할, 메뉴, 카테고리, 상품, 상품 문의 답변, 정책(배송/할인)
 - 주문 · 출고 · 클레임. 주문 계열은 검색창 1개(날짜·주문자명·품목 includes)
-- 비관리자·로그아웃은 쇼핑몰 홈으로
+- 비관리자·로그아웃은 쇼핑몰 홈으로. `/api/v1/admin/**`는 서버에서 ADMIN 역할 검사
 
 ### 시드
 - `server/seed/` 원두·콜드브루·드리퍼·머그 샘플과 카테고리 매핑
