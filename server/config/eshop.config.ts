@@ -1,8 +1,8 @@
-import cia from "./json/config.json";
+import eshop from "./json/config.json";
 
 const isProd = process.env.NODE_ENV === "production";
 const isLocal = process.env.NODE_ENV === "local";
-const SERVER_URI = isProd ? cia.server.prod : isLocal ? cia.server.local : cia.server.dev;
+const SERVER_URI = isProd ? eshop.server.prod : isLocal ? eshop.server.local : eshop.server.dev;
 const EXCEPT_URL = [
   "/login",
   "/auth/refreshToken",
@@ -15,4 +15,4 @@ const EXCEPT_URL = [
   "/favicon.ico",
 ];
 
-export {cia, SERVER_URI, EXCEPT_URL};
+export {eshop, SERVER_URI, EXCEPT_URL};

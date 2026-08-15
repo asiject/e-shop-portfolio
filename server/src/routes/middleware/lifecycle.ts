@@ -3,7 +3,7 @@ import {FastifyInstance, FastifyRequest} from "fastify";
 import {apiLogger as logger} from "@config/winston.config";
 import {xssFilter} from "@utils/StringUtils";
 import {ERROR_AUTH_MALFORMED, ERROR_AUTH_NOTEXISTS, ERROR_AUTH_UNVALID} from "src/error/AuthCode";
-import {EXCEPT_URL} from "@config/cia.config";
+import {EXCEPT_URL} from "@config/eshop.config";
 import {verifyJWT} from "@utils/OAuth2Utils";
 import {decrypted} from "@utils/CipherUtils";
 import {jwtProps} from "@props";
@@ -40,7 +40,6 @@ export default function (fastify: FastifyInstance) {
           req.body = {...req.body, jwt};
           return true;
         } catch (err: any) {
-          console.error(err);
           // const isExcept = EXCEPT_URL.filter(url => req.url?.startsWith(url))?.length > 0;
           // if (req?.url == "/auth/user") reply.cookie("access_token", "", {path: "/", signed: true, expires: new Date()});
           // if (!isExcept) {
@@ -77,7 +76,6 @@ export default function (fastify: FastifyInstance) {
     }
   });
   fastify.addHook("onError", async (req, reply, error) => {
-    console.log("onError >>");
     logger.error(error.stack);
   });
 }

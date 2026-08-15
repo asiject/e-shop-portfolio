@@ -6,7 +6,7 @@ import ejs from "ejs";
 import {FastifyInstance} from "fastify";
 import multipart from "@fastify/multipart";
 import cookie from "@fastify/cookie";
-import {cia} from "@config/cia.config";
+import {eshop} from "@config/eshop.config";
 export default async function (fastify: FastifyInstance) {
   /* FormBody */
   fastify.register(formbody);
@@ -44,11 +44,10 @@ export default async function (fastify: FastifyInstance) {
   });
    */
   fastify.register(cookie, {
-    secret: cia?.token?.secret, // for cookies signature
+    secret: eshop?.token?.secret, // for cookies signature
 
     //   hook: "preHandler", // set to false to disable cookie autoparsing or set autoparsing on any of the following hooks: 'onRequest', 'preParsing', 'preHandler', 'preValidation'. default: 'onRequest'
-    //FIXME: 추후에 동일한 도메인으로 수정하고, sameSite 삭제 할 것
-    parseOptions: {httpOnly: true}, // options for parsing cookies
-    // parseOptions: {httpOnly: true, sameSite: "none", secure: true}, // options for parsing cookies
+    // 브라우저→Vite 프록시→API는 같은 오리진. sameSite 생략 시 Lax. 크로스 도메인일 때만 none + secure
+    parseOptions: {httpOnly: true},
   });
 }

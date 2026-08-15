@@ -1,10 +1,10 @@
 import {FastifyRequest, FastifyReply} from "fastify";
 import {LOGIN_TYPE} from "@user/UserConstants";
 import {checkSSO, parseJWT} from "@utils/OAuth2Utils";
-import {cia} from "@config/cia.config";
+import {eshop} from "@config/eshop.config";
 import {OAuth2Client} from "google-auth-library";
 
-const _google = cia.oauth.google;
+const _google = eshop.oauth.google;
 const oAuth2Client = new OAuth2Client(_google.clientId, _google.clientSecret, "postmessage");
 // const authorizeUrl = oAuth2Client.generateAuthUrl({
 //   access_type: "offline",

@@ -1,0 +1,26 @@
+{
+  "server": {
+    "prod": "",
+    "dev": "",
+    "local": "http://localhost:3000"
+  },
+  "token": {
+    "secret": "change-me-token-secret",
+    "expiresIn": "1h"
+  },
+  "cipher": {
+    "alg": "aes-256-cbc",
+    "key": "change-me-cipher-key",
+    "iv": "change-me-cipher-iv"
+  },
+  "oauth": {
+    "google": {
+      "clientId": "",
+      "clientSecret": ""
+    },
+    "kakao": {
+      "clientId": "",
+      "clientSecret": ""
+    }
+  }
+}

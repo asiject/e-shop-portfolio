@@ -1,17 +1,17 @@
-import {cia} from "@config/cia.config";
+import {eshop} from "@config/eshop.config";
 import crypto from "crypto";
 
-const alg = cia?.cipher?.alg || "aes-256-cbc";
+const alg = eshop?.cipher?.alg || "aes-256-cbc";
 
 // 한글 주석: aes-256-cbc는 key 32바이트·iv 16바이트 필요 — 설정 문자열을 해시해 길이 맞춤
-const key = crypto.createHash("sha256").update(String(cia?.cipher?.key ?? "")).digest();
-const iv = crypto.createHash("md5").update(String(cia?.cipher?.iv ?? "")).digest();
+const key = crypto.createHash("sha256").update(String(eshop?.cipher?.key ?? "")).digest();
+const iv = crypto.createHash("md5").update(String(eshop?.cipher?.iv ?? "")).digest();
 
 export const encrypted = (plainText: string | undefined) => {
   if (plainText == "" || plainText == undefined) {
     return "";
   }
-  if (!cia?.cipher?.key || !cia?.cipher?.iv) {
+  if (!eshop?.cipher?.key || !eshop?.cipher?.iv) {
     throw new Error("cipher.key / cipher.iv is not configured");
   }
   let cipher = crypto.createCipheriv(alg, key, iv);
@@ -20,7 +20,7 @@ export const encrypted = (plainText: string | undefined) => {
   return encrypted;
 };
 export const decrypted = (encrypted: string) => {
-  if (!cia?.cipher?.key || !cia?.cipher?.iv) {
+  if (!eshop?.cipher?.key || !eshop?.cipher?.iv) {
     throw new Error("cipher.key / cipher.iv is not configured");
   }
   let decipher = crypto.createDecipheriv(alg, key, iv);

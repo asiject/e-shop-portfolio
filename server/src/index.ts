@@ -3,7 +3,7 @@ import {FastifyInstance} from "fastify";
 import {Server, IncomingMessage, ServerResponse} from "http";
 import middleware from "@routes/middleware/loader";
 import {apiLogger as logger} from "@config/winston.config";
-import {cia} from "@config/cia.config";
+import {eshop} from "@config/eshop.config";
 import {initDatasource} from "@lib/db";
 import {isDemoLoginEnabled} from "@user/service/demoUserService";
 import routes from "./routes";
@@ -15,13 +15,13 @@ middleware(fastify);
 routes(fastify);
 
 function warnConfig() {
-  if (!cia?.token?.secret) {
+  if (!eshop?.token?.secret) {
     logger.warn("config: token.secret is empty");
   }
-  if (!cia?.cipher?.key || !cia?.cipher?.iv) {
+  if (!eshop?.cipher?.key || !eshop?.cipher?.iv) {
     logger.warn("config: cipher.key/iv is empty — token encrypt/decrypt will fail");
   }
-  if (!cia?.oauth?.google?.clientId || !cia?.oauth?.google?.clientSecret) {
+  if (!eshop?.oauth?.google?.clientId || !eshop?.oauth?.google?.clientSecret) {
     logger.warn("config: oauth.google clientId/clientSecret is empty — Google login will fail");
   }
   if (isDemoLoginEnabled()) {
@@ -36,7 +36,7 @@ async function start() {
 
     //https://stackoverflow.com/questions/14043926/node-js-connect-only-works-on-localhost
     await fastify.listen({port: PORT, host: "0.0.0.0"});
-    console.log(`server start! http://127.0.0.1:${PORT}/`);
+    logger.info(`server start! http://127.0.0.1:${PORT}/`);
   } catch (err: any) {
     logger.error(`server loading error... ${err}`);
     process.exit(1);

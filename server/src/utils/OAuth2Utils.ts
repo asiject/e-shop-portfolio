@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
 import {FastifyRequest, FastifyReply} from "fastify";
-import {cia} from "@config/cia.config";
+import {eshop} from "@config/eshop.config";
 import {getUserLogin} from "@user/service/userLoginService";
 import {LOGIN_STATUS} from "@user/UserConstants";
 
-const token = cia?.token;
+const token = eshop?.token;
 
 export function parseJWT(token: string) {
   try {
