@@ -85,24 +85,24 @@ function RightButtons({selected, setOpen, handleRemoveItems, handleItemUseYn}: a
     <Box marginLeft={"auto"} sx={{display: "flex"}}>
       {selected?.length === 0 ? (
         <Tooltip title="추가">
-          <IconButton edge="end" sx={{color: "white"}} onClick={() => setOpen(true)}>
+          <IconButton edge="end" sx={{color: "inherit"}} onClick={() => setOpen(true)}>
             <AddIcon />
           </IconButton>
         </Tooltip>
       ) : (
         <>
           <Tooltip title="삭제">
-            <IconButton edge="end" sx={{color: "white"}} onClick={handleRemoveItems}>
+            <IconButton edge="end" sx={{color: "inherit"}} onClick={handleRemoveItems}>
               <DeleteIcon />
             </IconButton>
           </Tooltip>
           <Tooltip title="사용">
-            <IconButton edge="end" sx={{color: "white"}} onClick={() => handleItemUseYn("Y")}>
+            <IconButton edge="end" sx={{color: "inherit"}} onClick={() => handleItemUseYn("Y")}>
               <AddCircleOutlineIcon />
             </IconButton>
           </Tooltip>
           <Tooltip title="미사용">
-            <IconButton edge="end" sx={{color: "white"}} onClick={() => handleItemUseYn("N")}>
+            <IconButton edge="end" sx={{color: "inherit"}} onClick={() => handleItemUseYn("N")}>
               <RemoveCircleOutlineIcon />
             </IconButton>
           </Tooltip>

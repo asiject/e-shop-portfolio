@@ -1,8 +1,6 @@
-import {useEffect, useState} from "react";
-import {Box, Select, TextField, FormControlLabel, Switch, Button, IconButton as MuiIconButton} from "@mui/material";
-import {AppBar, Toolbar, IconButton, Tooltip, Typography} from "@mui/material";
+import {useEffect, useState, type ChangeEvent, type ReactNode} from "react";
+import {Box, Select, TextField, FormControlLabel, Switch, Button, IconButton as MuiIconButton, Typography, Tooltip, IconButton} from "@mui/material";
 import {useNavigate, useParams} from "react-router";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import CheckIcon from "@mui/icons-material/Check";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
@@ -12,6 +10,8 @@ import {postAdminProduct, putAdminProduct, uploadAdminProductImage} from "@recoi
 import {useQueryClient} from "react-query";
 import Loading from "@layout/Loading";
 import Error from "@layout/Error";
+import AdminGnb from "@layout/AdminGnb";
+import {wb} from "theme/adminWorkbench";
 
 type OptionRow = {
   optkey: string;
@@ -28,6 +28,25 @@ const emptyOption = (): OptionRow => ({
   price: "0",
   capacity: "0",
 });
+
+const fieldSx = {
+  "& .MuiOutlinedInput-root": {
+    bgcolor: wb.paper,
+    borderRadius: "2px",
+    "& fieldset": {borderColor: wb.line},
+    "&:hover fieldset": {borderColor: wb.ink},
+    "&.Mui-focused fieldset": {borderColor: wb.ink},
+  },
+};
+
+function FieldRow({label, children}: {label: string; children: ReactNode}) {
+  return (
+    <Box sx={{display: "flex", gap: 2, alignItems: "flex-start", mb: 2}}>
+      <Box sx={{width: 96, flexShrink: 0, pt: "10px", fontSize: 13, fontWeight: 650, color: wb.mute}}>{label}</Box>
+      <Box sx={{flex: 1, minWidth: 0}}>{children}</Box>
+    </Box>
+  );
+}
 
 export default function ProductWrite() {
   const navigate = useNavigate();
@@ -81,21 +100,11 @@ export default function ProductWrite() {
     }
   }, [product, isEdit]);
 
-  if (catLoading || (isEdit && prodLoading)) {
-    return <Loading />;
-  }
-  if (catError) {
-    return <Error error={catErr} />;
-  }
-  if (isEdit && prodError) {
-    return <Error error={prodErr} />;
-  }
-
   const handlePrev = () => {
     navigate("/admin/product");
   };
 
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleCategoryChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const selected = [...e.target.options].filter(o => o.selected).map(o => Number(o.value));
     setCategoryids(selected);
   };
@@ -111,6 +120,13 @@ export default function ProductWrite() {
     } catch (err) {
       console.error(err);
       alert("이미지 업로드에 실패했습니다");
+    }
+  };
+
+  const handleRemoveImage = (path: string) => {
+    setImages(prev => prev.filter(p => p !== path));
+    if (thumbnail === path) {
+      setThumbnail("");
     }
   };
 
@@ -184,148 +200,208 @@ export default function ProductWrite() {
   };
 
   return (
-    <>
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton sx={{color: "white"}} edge="start" onClick={handlePrev}>
-            <ChevronLeftIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{flexGrow: 1}}>
-            {isEdit ? "상품수정" : "상품추가"}
-          </Typography>
-          <Tooltip title="저장">
-            <span>
-              <IconButton edge="end" sx={{color: "white"}} onClick={handleSave} disabled={saving}>
-                <CheckIcon />
-              </IconButton>
-            </span>
-          </Tooltip>
-        </Toolbar>
-      </AppBar>
+    <AdminGnb
+      RightButtons={
+        <Tooltip title="저장">
+          <span>
+            <IconButton edge="end" onClick={handleSave} disabled={saving} aria-label="저장">
+              <CheckIcon />
+            </IconButton>
+          </span>
+        </Tooltip>
+      }>
+      {catLoading || (isEdit && prodLoading) ? (
+        <Loading />
+      ) : catError ? (
+        <Error error={catErr} />
+      ) : isEdit && prodError ? (
+        <Error error={prodErr} />
+      ) : (
+        <Box>
+          <Box sx={{display: "flex", alignItems: "flex-end", gap: 1, mb: 2}}>
+            <Box sx={{flex: 1}}>
+              <Typography component="h1" sx={{m: 0, fontSize: 22, fontWeight: 700, letterSpacing: "-0.03em"}}>
+                {isEdit ? "상품 수정" : "상품 등록"}
+              </Typography>
+              <Typography sx={{m: 0, mt: 0.5, fontSize: 13, color: wb.mute}}>
+                {isEdit ? "기본 정보를 고친 뒤 저장합니다." : "카테고리·가격·옵션을 한 화면에서 넣습니다."}
+              </Typography>
+            </Box>
+            <Button onClick={handlePrev} sx={{color: wb.ink}}>
+              목록
+            </Button>
+            <Button variant="contained" onClick={handleSave} disabled={saving}>
+              저장
+            </Button>
+          </Box>
 
-      <Box
-        sx={{
-          p: 3,
-          ".rows": {display: "flex", mb: 1.5, alignItems: "flex-start"},
-          ".header": {width: 120, padding: "10px 0", flexShrink: 0},
-          ".value": {width: "calc(100% - 120px)"},
-        }}>
-        <Box className="rows">
-          <Box className="header">카테고리</Box>
-          <Box className="value">
-            <Select
-              multiple
-              native
-              value={categoryids.map(String)}
-              onChange={handleCategoryChange as any}
-              disabled={isEdit}
-              inputProps={{size: 6}}
-              sx={{minWidth: 240}}>
-              {(categories || []).map((c: any) => (
-                <option key={c.id} value={c.id}>
-                  {c.title}
-                </option>
-              ))}
-            </Select>
-            {isEdit && (
-              <Typography variant="caption" color="text.secondary" display="block" sx={{mt: 0.5}}>
-                수정 시 카테고리는 카테고리 관리에서 연결하세요
-              </Typography>
-            )}
-          </Box>
-        </Box>
-        <Box className="rows">
-          <Box className="header">상품명</Box>
-          <Box className="value">
-            <TextField size="small" fullWidth value={title} onChange={e => setTitle(e.target.value)} />
-          </Box>
-        </Box>
-        <Box className="rows">
-          <Box className="header">판매가</Box>
-          <Box className="value">
-            <TextField size="small" fullWidth type="number" value={price} onChange={e => setPrice(e.target.value)} />
-          </Box>
-        </Box>
-        <Box className="rows">
-          <Box className="header">재고수량</Box>
-          <Box className="value">
-            <TextField size="small" fullWidth type="number" value={stock} onChange={e => setStock(e.target.value)} />
-          </Box>
-        </Box>
-        <Box className="rows">
-          <Box className="header">간단설명</Box>
-          <Box className="value">
-            <TextField size="small" fullWidth value={description} onChange={e => setDescription(e.target.value)} inputProps={{maxLength: 100}} />
-          </Box>
-        </Box>
-        <Box className="rows">
-          <Box className="header">노출</Box>
-          <Box className="value">
-            <FormControlLabel control={<Switch checked={showyn} onChange={e => setShowyn(e.target.checked)} />} label={showyn ? "노출" : "숨김"} />
-          </Box>
-        </Box>
-        <Box className="rows">
-          <Box className="header">옵션</Box>
-          <Box className="value" sx={{display: "flex", flexDirection: "column", gap: 1}}>
-            {options.map((row, idx) => (
-              <Box key={idx} sx={{display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center"}}>
-                <TextField size="small" label="옵션명" value={row.optkey} onChange={e => {
-                  const next = [...options];
-                  next[idx] = {...next[idx], optkey: e.target.value};
-                  setOptions(next);
-                }} />
-                <TextField size="small" label="옵션값" value={row.itemval} onChange={e => {
-                  const next = [...options];
-                  next[idx] = {...next[idx], itemval: e.target.value, optvals: e.target.value};
-                  setOptions(next);
-                }} />
-                <TextField size="small" label="추가금" type="number" value={row.price} onChange={e => {
-                  const next = [...options];
-                  next[idx] = {...next[idx], price: e.target.value};
-                  setOptions(next);
-                }} sx={{width: 100}} />
-                <TextField size="small" label="재고" type="number" value={row.capacity} onChange={e => {
-                  const next = [...options];
-                  next[idx] = {...next[idx], capacity: e.target.value};
-                  setOptions(next);
-                }} sx={{width: 100}} />
-                <MuiIconButton
-                  aria-label="옵션 삭제"
-                  onClick={() => setOptions(options.length === 1 ? [emptyOption()] : options.filter((_, i) => i !== idx))}>
-                  <DeleteIcon fontSize="small" />
-                </MuiIconButton>
+          <Box sx={{bgcolor: wb.paper, border: `1px solid ${wb.line}`, p: 2.5, maxWidth: 840}}>
+            <FieldRow label="카테고리">
+              <Select
+                multiple
+                native
+                value={categoryids.map(String)}
+                onChange={handleCategoryChange as any}
+                disabled={isEdit}
+                inputProps={{"aria-label": "카테고리", size: 6}}
+                sx={{minWidth: 240, ...fieldSx}}>
+                {(categories || []).map((c: any) => (
+                  <option key={c.id} value={c.id}>
+                    {c.title}
+                  </option>
+                ))}
+              </Select>
+              {isEdit && (
+                <Typography sx={{mt: 0.5, fontSize: 12, color: wb.mute}}>수정 시 카테고리는 카테고리 관리에서 연결하세요</Typography>
+              )}
+            </FieldRow>
+            <FieldRow label="상품명">
+              <TextField size="small" fullWidth value={title} onChange={e => setTitle(e.target.value)} sx={fieldSx} />
+            </FieldRow>
+            <FieldRow label="판매가">
+              <TextField size="small" fullWidth type="number" value={price} onChange={e => setPrice(e.target.value)} sx={fieldSx} />
+            </FieldRow>
+            <FieldRow label="재고수량">
+              <TextField size="small" fullWidth type="number" value={stock} onChange={e => setStock(e.target.value)} sx={fieldSx} />
+            </FieldRow>
+            <FieldRow label="간단설명">
+              <TextField
+                size="small"
+                fullWidth
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                inputProps={{maxLength: 100}}
+                sx={fieldSx}
+              />
+            </FieldRow>
+            <FieldRow label="노출">
+              <FormControlLabel
+                control={<Switch checked={showyn} onChange={e => setShowyn(e.target.checked)} />}
+                label={showyn ? "노출" : "숨김"}
+              />
+            </FieldRow>
+            <FieldRow label="옵션">
+              <Box sx={{display: "flex", flexDirection: "column", gap: 1}}>
+                {options.map((row, idx) => (
+                  <Box key={idx} sx={{display: "flex", gap: 1, flexWrap: "wrap", alignItems: "center"}}>
+                    <TextField
+                      size="small"
+                      label="옵션명"
+                      value={row.optkey}
+                      onChange={e => {
+                        const next = [...options];
+                        next[idx] = {...next[idx], optkey: e.target.value};
+                        setOptions(next);
+                      }}
+                      sx={fieldSx}
+                    />
+                    <TextField
+                      size="small"
+                      label="옵션값"
+                      value={row.itemval}
+                      onChange={e => {
+                        const next = [...options];
+                        next[idx] = {...next[idx], itemval: e.target.value, optvals: e.target.value};
+                        setOptions(next);
+                      }}
+                      sx={fieldSx}
+                    />
+                    <TextField
+                      size="small"
+                      label="추가금"
+                      type="number"
+                      value={row.price}
+                      onChange={e => {
+                        const next = [...options];
+                        next[idx] = {...next[idx], price: e.target.value};
+                        setOptions(next);
+                      }}
+                      sx={{width: 100, ...fieldSx}}
+                    />
+                    <TextField
+                      size="small"
+                      label="재고"
+                      type="number"
+                      value={row.capacity}
+                      onChange={e => {
+                        const next = [...options];
+                        next[idx] = {...next[idx], capacity: e.target.value};
+                        setOptions(next);
+                      }}
+                      sx={{width: 100, ...fieldSx}}
+                    />
+                    <MuiIconButton
+                      aria-label="옵션 삭제"
+                      onClick={() => setOptions(options.length === 1 ? [emptyOption()] : options.filter((_, i) => i !== idx))}>
+                      <DeleteIcon fontSize="small" />
+                    </MuiIconButton>
+                  </Box>
+                ))}
+                <Button startIcon={<AddIcon />} onClick={() => setOptions([...options, emptyOption()])} size="small" sx={{alignSelf: "flex-start", color: wb.ink}}>
+                  옵션 추가
+                </Button>
+                {isEdit && (
+                  <Typography sx={{fontSize: 12, color: wb.mute}}>수정 모드에서는 기본 정보만 저장됩니다 (옵션은 신규 등록 시 저장)</Typography>
+                )}
               </Box>
-            ))}
-            <Button startIcon={<AddIcon />} onClick={() => setOptions([...options, emptyOption()])} size="small">
-              옵션 추가
-            </Button>
-            {isEdit && (
-              <Typography variant="caption" color="text.secondary">
-                수정 모드에서는 기본 정보만 저장됩니다 (옵션은 신규 등록 시 저장)
-              </Typography>
-            )}
+            </FieldRow>
+            <FieldRow label="이미지">
+              <Box sx={{display: "flex", flexDirection: "column", gap: 1}}>
+                <TextField
+                  size="small"
+                  fullWidth
+                  placeholder="/product/images/..."
+                  value={thumbnail}
+                  onChange={e => setThumbnail(e.target.value)}
+                  sx={fieldSx}
+                />
+                <Button variant="outlined" component="label" size="small" sx={{alignSelf: "flex-start"}}>
+                  파일 업로드
+                  <input hidden type="file" accept="image/*" onChange={e => handleUpload(e.target.files?.[0])} />
+                </Button>
+                {images.length > 0 && (
+                  <Box sx={{display: "flex", flexWrap: "wrap", gap: 1, mt: 0.5}}>
+                    {images.map(path => {
+                      const isThumb = path === thumbnail;
+                      return (
+                        <Box key={path} sx={{position: "relative", width: 88, height: 88}}>
+                          <Box
+                            component="button"
+                            type="button"
+                            onClick={() => setThumbnail(path)}
+                            aria-pressed={isThumb}
+                            aria-label={isThumb ? "대표 이미지" : "대표로 지정"}
+                            sx={{
+                              width: "100%",
+                              height: "100%",
+                              p: 0,
+                              border: `1px solid ${isThumb ? wb.action : wb.line}`,
+                              bgcolor: wb.bg,
+                              cursor: "pointer",
+                              overflow: "hidden",
+                            }}>
+                            <Box component="img" src={path} alt="" sx={{width: "100%", height: "100%", objectFit: "cover", display: "block"}} />
+                          </Box>
+                          <MuiIconButton
+                            aria-label="이미지 삭제"
+                            size="small"
+                            onClick={() => handleRemoveImage(path)}
+                            sx={{position: "absolute", top: 0, right: 0, bgcolor: wb.paper}}>
+                            <DeleteIcon fontSize="inherit" />
+                          </MuiIconButton>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                )}
+              </Box>
+            </FieldRow>
+            <FieldRow label="상세 설명">
+              <TextField size="small" fullWidth multiline minRows={6} value={content} onChange={e => setContent(e.target.value)} sx={fieldSx} />
+            </FieldRow>
           </Box>
         </Box>
-        <Box className="rows">
-          <Box className="header">대표 이미지</Box>
-          <Box className="value" sx={{display: "flex", flexDirection: "column", gap: 1}}>
-            <TextField size="small" fullWidth placeholder="/product/images/..." value={thumbnail} onChange={e => setThumbnail(e.target.value)} />
-            <Button variant="outlined" component="label" size="small" sx={{alignSelf: "flex-start"}}>
-              파일 업로드
-              <input hidden type="file" accept="image/*" onChange={e => handleUpload(e.target.files?.[0])} />
-            </Button>
-            {thumbnail && (
-              <Box component="img" src={thumbnail} alt="thumbnail" sx={{maxWidth: 160, maxHeight: 160, objectFit: "cover"}} />
-            )}
-          </Box>
-        </Box>
-        <Box className="rows">
-          <Box className="header">상세 설명</Box>
-          <Box className="value">
-            <TextField size="small" fullWidth multiline minRows={6} value={content} onChange={e => setContent(e.target.value)} />
-          </Box>
-        </Box>
-      </Box>
-    </>
+      )}
+    </AdminGnb>
   );
 }

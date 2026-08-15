@@ -27,10 +27,8 @@ export default function AdminRoleList() {
   if (isError) {
     return <Error error={error} />;
   }
-  console.log("data >", data);
   const handleAddItems = async (items: any) => {
     const uids = items?.map((user: any) => user?.userid);
-    console.log("uids >", uids, {uids});
     await postAdminRoleUser(roleid, {uids});
     setList(items);
   };
@@ -52,14 +50,14 @@ function RightButtons({selected, setOpen, handleRemoveItems}: any) {
   const buttonList = [
     selected?.length == 0 && (
       <Tooltip key={"add"} title="추가">
-        <IconButton edge="end" sx={{color: "white"}} onClick={() => setOpen(true)}>
+        <IconButton edge="end" sx={{color: "inherit"}} onClick={() => setOpen(true)}>
           <AddIcon />
         </IconButton>
       </Tooltip>
     ),
     selected?.length > 0 && (
       <Tooltip key={"del"} title="삭제">
-        <IconButton edge="end" sx={{color: "white"}} onClick={handleRemoveItems}>
+        <IconButton edge="end" sx={{color: "inherit"}} onClick={handleRemoveItems}>
           <RemoveIcon />
         </IconButton>
       </Tooltip>

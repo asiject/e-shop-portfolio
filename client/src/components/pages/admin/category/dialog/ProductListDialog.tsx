@@ -40,7 +40,6 @@ export default function ProductListDialog({initItems, open, setOpen, handleAddIt
     setOpen(false);
     handleAddItems(selected);
   };
-  console.log("data >", data);
   return (
     <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
       <AppBar sx={{position: "relative"}}>

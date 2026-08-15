@@ -41,13 +41,11 @@ export default async function (fastify: FastifyInstance) {
   fastify.delete("/:roleid/:userid", async (req: FastifyRequest<{Params: {roleid: string; userid: string}}>, reply: FastifyReply) => {
     const {roleid, userid} = req.params;
     const user = await removeRoleByUserId(roleid, userid);
-    console.log("user >>>", user);
     reply.send(user);
   });
   fastify.delete("/:roleid", async (req: FastifyRequest<{Params: {roleid: string}}>, reply: FastifyReply) => {
     const {roleid} = req.params;
     const role = await removeRoleById(roleid);
-    console.log("user >>>", role);
     reply.send(role);
   });
 }

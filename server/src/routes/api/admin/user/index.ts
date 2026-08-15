@@ -13,7 +13,6 @@ export default async function (fastify: FastifyInstance) {
   });
   fastify.get("/:userid", async (req: FastifyRequest<{Params: {userid: string}}>, reply: FastifyReply) => {
     const {userid} = req.params;
-    console.log("userid>>", userid);
     const user = await getUserInfo(userid);
     reply.send(user);
   });

@@ -1,121 +1,79 @@
-import {Box, Grid, IconButton, Typography} from "@mui/material";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import AdminGnb from "@layout/AdminGnb";
-import Loading from "@layout/Loading";
-import Error from "@layout/Error";
-import {useAdminDashboardStatsQuery} from "@recoils/admin/order/query";
-import {useNavigate} from "react-router";
+import {Box, IconButton, Typography} from "@mui/material"
+import RefreshIcon from "@mui/icons-material/Refresh"
+import AdminGnb from "@layout/AdminGnb"
+import Loading from "@layout/Loading"
+import Error from "@layout/Error"
+import {useAdminDashboardStatsQuery} from "@recoils/admin/order/query"
+import {useNavigate} from "react-router"
+import {wb} from "theme/adminWorkbench"
+
+type QueueItem = {label: string; value: number; to: string; hot?: boolean}
 
 export default function AdminDashboard() {
   return (
     <AdminGnb>
       <MainPane />
     </AdminGnb>
-  );
+  )
 }
 
 function MainPane() {
-  const navigate = useNavigate();
-  const {isLoading, isError, stats, refetch} = useAdminDashboardStatsQuery();
-  const updatedAt = new Date().toLocaleTimeString("ko-KR", {hour: "2-digit", minute: "2-digit"});
+  const navigate = useNavigate()
+  const {isLoading, isError, stats, refetch} = useAdminDashboardStatsQuery()
+  const updatedAt = new Date().toLocaleTimeString("ko-KR", {hour: "2-digit", minute: "2-digit"})
 
-  if (isLoading) {
-    return <Loading />;
-  }
-  if (isError) {
-    return <Error />;
-  }
+  if (isLoading) return <Loading />
+  if (isError) return <Error />
+
+  const queues: QueueItem[] = [
+    {label: "신규 주문", value: stats.wait, to: "/admin/order", hot: true},
+    {label: "배송 준비", value: stats.shipment, to: "/admin/shipment"},
+    {label: "취소 요청", value: stats.cancel, to: "/admin/claim?type=cancel", hot: true},
+    {label: "반품 요청", value: stats.return, to: "/admin/claim?type=return", hot: true},
+    {label: "교환 요청", value: stats.change, to: "/admin/claim?type=change", hot: true},
+    {label: "완료", value: stats.complete, to: "/admin/order?tab=done"},
+  ]
 
   return (
-    <Box sx={{p: 3}}>
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={6}>
-          <Box sx={{border: "1px solid #ccc", height: "100%"}}>
-            <Box sx={{display: "flex", padding: "10px 20px", alignItems: "center"}}>
-              <Box>주문/배송</Box>
-              <Box sx={{marginLeft: "auto", display: "flex", gap: "5px", alignItems: "center"}}>
-                <Box>{updatedAt}</Box>
-                <IconButton size="small" onClick={() => refetch()} aria-label="새로고침">
-                  <RefreshIcon fontSize="small" />
-                </IconButton>
-              </Box>
-            </Box>
-            <Box sx={{display: "flex", gap: 2, padding: 2, justifyContent: "center", flexWrap: "wrap"}}>
-              <StatBox label="신규주문(WAIT)" value={stats.wait} onClick={() => navigate("/admin/order")} />
-              <StatBox label="배송준비/결제" value={stats.shipment} onClick={() => navigate("/admin/shipment")} />
-              <StatBox label="완료 등" value={stats.complete} onClick={() => navigate("/admin/order")} />
+    <Box>
+      <Box sx={{display: "flex", alignItems: "flex-end", gap: 1, mb: 2}}>
+        <Box sx={{flex: 1}}>
+          <Typography component="h1" sx={{m: 0, fontSize: 22, fontWeight: 700, letterSpacing: "-0.03em"}}>
+            오늘 큐
+          </Typography>
+          <Typography sx={{m: 0, mt: 0.5, fontSize: 13, color: wb.mute}}>갱신 {updatedAt}</Typography>
+        </Box>
+        <IconButton size="small" onClick={() => refetch()} aria-label="새로고침" sx={{color: wb.ink}}>
+          <RefreshIcon fontSize="small" />
+        </IconButton>
+      </Box>
+      <Box sx={{display: "flex", flexDirection: "column", gap: 1}}>
+        {queues.map(item => (
+          <Box
+            key={item.to}
+            component="button"
+            type="button"
+            onClick={() => navigate(item.to)}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              width: "100%",
+              p: 1.5,
+              border: `1px solid ${wb.line}`,
+              bgcolor: wb.paper,
+              color: wb.ink,
+              cursor: "pointer",
+              font: "inherit",
+              textAlign: "left",
+              "&:hover": {borderColor: wb.action},
+            }}>
+            <Box>{item.label}</Box>
+            <Box sx={{ml: "auto", fontWeight: 700, fontVariantNumeric: "tabular-nums", color: item.hot && item.value > 0 ? wb.wait : wb.ink}}>
+              {item.value}건
             </Box>
           </Box>
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Box sx={{border: "1px solid #ccc", height: "100%"}}>
-            <Box sx={{display: "flex", padding: "10px 20px", alignItems: "center"}}>
-              <Box>클레임</Box>
-              <Box sx={{marginLeft: "auto", display: "flex", gap: "5px", alignItems: "center"}}>
-                <Box>{updatedAt}</Box>
-                <IconButton size="small" onClick={() => refetch()} aria-label="클레임 새로고침">
-                  <RefreshIcon fontSize="small" />
-                </IconButton>
-              </Box>
-            </Box>
-            <Box sx={{padding: "10px 20px", display: "flex", flexDirection: "column", gap: 1}}>
-              <ClaimLine label="취소요청" value={stats.cancel} onClick={() => navigate("/admin/claim?type=cancel")} />
-              <ClaimLine label="반품요청" value={stats.return} onClick={() => navigate("/admin/claim?type=return")} />
-              <ClaimLine label="교환요청" value={stats.change} onClick={() => navigate("/admin/claim?type=change")} />
-            </Box>
-          </Box>
-        </Grid>
-      </Grid>
+        ))}
+      </Box>
     </Box>
-  );
-}
-
-function StatBox({label, value, onClick}: {label: string; value: number; onClick: () => void}) {
-  return (
-    <Box
-      role="button"
-      tabIndex={0}
-      onClick={onClick}
-      onKeyDown={e => {
-        if (e.key === "Enter" || e.key === " ") onClick();
-      }}
-      sx={{
-        width: 140,
-        height: 120,
-        border: "1px solid #333",
-        padding: 2,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        gap: 2,
-        cursor: "pointer",
-      }}>
-      <Typography variant="body2">{label}</Typography>
-      <Typography variant="h6">{value}건</Typography>
-    </Box>
-  );
-}
-
-function ClaimLine({label, value, onClick}: {label: string; value: number; onClick: () => void}) {
-  return (
-    <Box
-      role="button"
-      tabIndex={0}
-      onClick={onClick}
-      onKeyDown={e => {
-        if (e.key === "Enter" || e.key === " ") onClick();
-      }}
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        border: "1px solid #333",
-        height: 40,
-        padding: "0 10px",
-        cursor: "pointer",
-      }}>
-      <Box>{label}</Box>
-      <Box sx={{marginLeft: "auto"}}>{value}건</Box>
-    </Box>
-  );
+  )
 }

@@ -81,14 +81,14 @@ function RightButtons({selected, handleRemoveItems, handleItemUseYn}: any) {
   const buttonList = [
     selected?.length == 0 && (
       <Tooltip key="add" title="추가">
-        <IconButton edge="end" sx={{color: "white"}} onClick={onMovePage}>
+        <IconButton edge="end" sx={{color: "inherit"}} onClick={onMovePage}>
           <AddIcon />
         </IconButton>
       </Tooltip>
     ),
     selected?.length > 0 && (
       <Tooltip key="delete" title="삭제">
-        <IconButton edge="end" sx={{color: "white"}} onClick={handleRemoveItems}>
+        <IconButton edge="end" sx={{color: "inherit"}} onClick={handleRemoveItems}>
           <DeleteIcon />
         </IconButton>
       </Tooltip>
@@ -97,7 +97,7 @@ function RightButtons({selected, handleRemoveItems, handleItemUseYn}: any) {
       <Tooltip key="usey" title="사용">
         <IconButton
           edge="end"
-          sx={{color: "white"}}
+          sx={{color: "inherit"}}
           onClick={() => {
             handleItemUseYn("Y");
           }}>
@@ -109,7 +109,7 @@ function RightButtons({selected, handleRemoveItems, handleItemUseYn}: any) {
       <Tooltip key="usen" title="미사용">
         <IconButton
           edge="end"
-          sx={{color: "white"}}
+          sx={{color: "inherit"}}
           onClick={() => {
             handleItemUseYn("N");
           }}>
