@@ -83,11 +83,33 @@ INSERT INTO `menu` (`id`, `title`, `url`, `useyn`, `sortno`, `createdate`) VALUE
   (9, 'menu.menu', '/admin/menu', 'Y', 9, NOW());
 ALTER TABLE `menu` AUTO_INCREMENT = 10;
 
--- 데모 로그인용 (계정 자체는 POST /auth/demo 첫 호출 시 자동 생성)
 -- synchronize=false 환경이면 user_login.type 에 DEMO 추가 필요:
 -- ALTER TABLE `user_login` MODIFY COLUMN `type` ENUM('GOOGLE','KAKAO','NAVER','DEMO') NOT NULL;
 INSERT INTO `role` (`roleid`, `rolename`)
 VALUES ('ADMIN', '관리자')
 ON DUPLICATE KEY UPDATE `rolename` = VALUES(`rolename`);
+
+-- 데모 유저 / 데모 관리자 (demoUserService DEMO_ACCOUNTS 와 동일)
+DELETE FROM `user_role`
+WHERE `userid` IN (SELECT `userid` FROM `user` WHERE `sabun` IN (9998001, 9998002));
+DELETE FROM `user_login`
+WHERE `ssoid` IN ('demo-user-eshop', 'demo-admin-eshop');
+DELETE FROM `user` WHERE `sabun` IN (9998001, 9998002);
+
+SET @demo_user_id = UUID();
+SET @demo_admin_id = UUID();
+
+INSERT INTO `user` (`userid`, `username`, `photo`, `phone`, `sabun`, `refresh_token`, `createdate`)
+VALUES
+  (@demo_user_id, '데모유저', '', NULL, 9998001, NULL, NOW(6)),
+  (@demo_admin_id, '데모관리자', '', NULL, 9998002, NULL, NOW(6));
+
+INSERT INTO `user_login` (`userid`, `ssoid`, `email`, `type`, `createdate`)
+VALUES
+  (@demo_user_id, 'demo-user-eshop', 'demo-user@eshop.local', 'DEMO', NOW(6)),
+  (@demo_admin_id, 'demo-admin-eshop', 'demo-admin@eshop.local', 'DEMO', NOW(6));
+
+INSERT INTO `user_role` (`userid`, `roleid`)
+VALUES (@demo_admin_id, 'ADMIN');
 
 COMMIT;

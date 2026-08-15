@@ -10,8 +10,7 @@
     "showyn": "Y",
     "editor": "<p>가상 시드 상품입니다. 오리지널 블렌드 원두.</p>",
     "images": [
-      {"sortno": 1, "path": "/public/img/seed/product-01.jpg"},
-      {"sortno": 2, "path": "/public/img/seed/product-01-2.jpg"}
+      {"sortno": 1, "path": "/public/img/seed/product-01.jpg"}
     ],
     "options": [
       {
