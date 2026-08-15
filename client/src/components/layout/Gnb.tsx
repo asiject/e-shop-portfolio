@@ -15,6 +15,7 @@ import Loading from "./Loading";
 import Error from "./Error";
 import {postLogout} from "@recoils/login/axios";
 import {kraft} from "theme/kraft";
+import Logo from "components/shop/Logo";
 
 export default function Gnb() {
   const {isLoading, isError, data, error} = useCategoryListQuery();
@@ -63,23 +64,7 @@ export default function Gnb() {
             flexWrap: "wrap",
           }}>
           <Box sx={{display: "flex", alignItems: "center", gap: 1.5}}>
-            <Box
-              component={Link}
-              to="/"
-              aria-label="E-SHOP 홈"
-              sx={{
-                backgroundColor: kraft.ink,
-                color: kraft.sticker,
-                "&&": {color: kraft.sticker},
-                fontFamily: kraft.display,
-                fontWeight: 700,
-                fontSize: 28,
-                letterSpacing: "0.04em",
-                lineHeight: 1,
-                padding: "6px 12px 4px",
-              }}>
-              E-SHOP
-            </Box>
+            <Logo to="/" size="md" />
             <Box
               aria-hidden="true"
               sx={{

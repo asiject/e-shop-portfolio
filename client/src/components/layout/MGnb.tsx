@@ -15,6 +15,7 @@ import Loading from "./Loading";
 import Error from "./Error";
 import {postLogout} from "@recoils/login/axios";
 import {kraft} from "theme/kraft";
+import Logo from "components/shop/Logo";
 
 export default function MGnb() {
   const {isLoading, isError, data, error} = useCategoryListQuery();
@@ -67,23 +68,7 @@ export default function MGnb() {
             <MenuIcon sx={{fontSize: 26, mr: 0.5}} />
             <SearchIcon sx={{fontSize: 26}} />
           </Box>
-          <Box
-            component={Link}
-            to="/m/"
-            aria-label="E-SHOP 홈"
-            sx={{
-              backgroundColor: kraft.ink,
-              color: kraft.sticker,
-              "&&": {color: kraft.sticker},
-              fontFamily: kraft.display,
-              fontWeight: 700,
-              fontSize: 18,
-              letterSpacing: "0.04em",
-              padding: "4px 8px 3px",
-              lineHeight: 1,
-            }}>
-            E-SHOP
-          </Box>
+          <Logo to="/m/" size="sm" />
           <Box sx={{display: "flex", alignItems: "center", gap: 0.5, color: kraft.ink}}>
             {loggedIn ? (
               <>

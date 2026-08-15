@@ -1,10 +1,16 @@
-import {type ReactNode} from "react";
+import {type ReactNode, useEffect} from "react";
 import {Box, ThemeProvider} from "@mui/material";
 import {useLocation} from "react-router-dom";
+import {rememberPublicPath} from "@utils/safeBack";
 import {kraft, kraftTheme} from "./kraft";
 
 export default function ShopShell({children}: {children: ReactNode}) {
   const {pathname} = useLocation();
+
+  useEffect(() => {
+    rememberPublicPath(pathname);
+  }, [pathname]);
+
   if (pathname.startsWith("/admin")) {
     return <>{children}</>;
   }

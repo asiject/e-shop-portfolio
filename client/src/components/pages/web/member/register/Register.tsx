@@ -5,16 +5,18 @@ import {Box, Button, TextField} from "@mui/material";
 import {useForm} from "react-hook-form";
 import {LoginAuth, UserLogin} from "@props";
 import {postRegister} from "@recoils/login/axios";
+
+type RegisterForm = UserLogin & {sabun: string};
+
 export default function Register() {
   const loginAuth: LoginAuth = useRecoilValue(loginAuthState);
   const navigate = useNavigate();
-  const {register, handleSubmit} = useForm<FormData>();
+  const {register, handleSubmit} = useForm<RegisterForm>();
 
-  const handleRegister = async (formdata: FormData) => {
+  const handleRegister = async (formdata: RegisterForm) => {
     const {data} = await postRegister(formdata);
     navigate("/");
   };
-  console.log("loginAuth >", loginAuth);
   if (loginAuth == null) {
     return <Navigate to="/" />;
   }
@@ -34,7 +36,7 @@ export default function Register() {
         </Box>
       </Box>
       <Box className="row">
-        <Box className="header">사번</Box>
+        <Box className="header">번호</Box>
         <Box className="value">
           {" "}
           <TextField type={"number"} size="small" {...register("sabun")} />

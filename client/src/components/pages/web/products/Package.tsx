@@ -1,9 +1,10 @@
 import React, {useEffect, useRef, useState} from "react";
 import {Box, Button, FormControl, InputLabel, MenuItem, Select} from "@mui/material";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import {styles} from "../../layout/styles";
+import {Styles} from "@styles";
 import Location from "./div/Location";
 export default function Package({packageMethod, setPackageMethod}: any) {
+  const styles = Styles();
   const [open, setOpen] = useState(false);
   const delivery = useRef<HTMLElement>();
   const location = useRef<HTMLElement>();

@@ -2,20 +2,24 @@ import {Box, Button} from "@mui/material";
 import {MStyles} from "@styles";
 
 const onMove = (id: string) => {
-  document.getElementById(id)!.scrollIntoView({behavior: "smooth"});
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({behavior: "smooth"});
 };
 
 export default function ContentMenubar() {
   return (
-    <Box component={"ul"} sx={MStyles.contentMenubar}>
-      <Box component={"li"}>
-        <Button onClick={() => onMove("info")}>상세 정보</Button>
-      </Box>
-      <Box component={"li"}>
-        <Button onClick={() => onMove("qna")}>상품 문의</Button>
-      </Box>
-      <Box component={"li"}>
-        <Button onClick={() => onMove("takeback")}>교환/환불 정보</Button>
+    <Box component="nav" aria-label="상품 본문">
+      <Box component="ul" sx={MStyles.contentMenubar}>
+        <Box component="li">
+          <Button onClick={() => onMove("info")}>상세</Button>
+        </Box>
+        <Box component="li">
+          <Button onClick={() => onMove("qna")}>문의</Button>
+        </Box>
+        <Box component="li">
+          <Button onClick={() => onMove("takeback")}>교환/환불</Button>
+        </Box>
       </Box>
     </Box>
   );

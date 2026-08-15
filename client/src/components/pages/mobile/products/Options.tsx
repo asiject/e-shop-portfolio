@@ -19,7 +19,7 @@ export default function Options({
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
   const handleChange = (e: any) => {
-    // TODO: blur()
+    e?.target?.blur?.();
     if (selectFair.length == 0 || selectFair[0].key == optkey) {
       setSelectFair([{key: optkey, value: e.target.value}]);
     } else if (selectFair[0].key != optkey) {
@@ -42,8 +42,10 @@ export default function Options({
     }
   };
   return (
-    <FormControl sx={MStyles.optionFormBox} size="small">
-      <InputLabel id={optkey}>{optkey}</InputLabel>
+    <FormControl sx={MStyles.optionFormBox} size="small" fullWidth>
+      <InputLabel id={optkey} sx={{color: "#4A341F"}}>
+        {optkey}
+      </InputLabel>
       <Select
         label={optkey}
         onChange={handleChange}
