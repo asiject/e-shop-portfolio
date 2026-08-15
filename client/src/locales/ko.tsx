@@ -23,6 +23,7 @@ const ko = {
   "menu.claim.return": "반송 관리",
   "menu.claim.cancel": "취소 관리",
   logout: "로그아웃",
+  shop: "쇼핑몰",
 
   "dashboard.curruser": "현재 접속자 수",
   "dashboard.accuser": "누적 접속자 수",
@@ -73,7 +74,7 @@ const ko = {
   "account.id": "아이디",
   "account.password": "비밀번호",
   "account.name": "이름",
-  "account.sabun": "간사번호",
+  "account.sabun": "번호",
   "account.email": "이메일",
   "account.phone": "전화번호",
   "account.admin": "관리자",

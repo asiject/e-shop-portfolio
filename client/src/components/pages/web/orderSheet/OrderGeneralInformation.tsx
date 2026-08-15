@@ -57,10 +57,7 @@ export default function OrderGeneralInformation({
 
   const {isLoading, isError, data, error, refetch} = useRecentDestinationQuery(user?.userid);
 
-  console.log("data 1234444>", data);
-
   useEffect(() => {
-    console.log("data 2323>", data);
     // refetch();
     refInit();
     // setDeliveryList(data);
@@ -100,8 +97,7 @@ export default function OrderGeneralInformation({
   };
 
   // const handleOrdered = async formData => {
-  const handleOrdered = async (inputData: any) => {
-    console.log("inputData >", inputData);
+  const handleOrdered = async (_inputData: any) => {
     /*
     await execute(async () => {
       const info = {
@@ -120,7 +116,7 @@ export default function OrderGeneralInformation({
         return;
       }
       // orders payment, delivery, buyer 정보 받아서 저장
-      //  const orderData = await axios.put(`/api/v1/user/${user.userid}/order/${id}/status`, params);
+      //  const orderData = await axios.put(`/api/v1/user/${user.userid}/order/${id}/checkout`, params);
       {
         user && user.userid;
       }
@@ -138,7 +134,7 @@ export default function OrderGeneralInformation({
         //  const addressData = await axios.post(`/api/v1/user/${user.userid}/address`, address);
         // console.log("address Data : ", addressData.data);
       }
-      // user_payment 에 페이공제 정보[장부명, 장부 번호] 저장
+      // user_payment 에 페이공제 정보 저장
       // { alias : payname, sabun: paynumber, userid}
       const payment = {
         userid: user.userid,
@@ -454,8 +450,8 @@ export default function OrderGeneralInformation({
             </Box>
             <Box className="row" ref={paymentRef}>
               <Box sx={{maxWidth: "300px", minHeight: "100px"}}>
-                <TextField variant="standard" {...register("payname")} label={"간사(장부) 이름"} />
-                <TextField variant="standard" {...register("paynumber")} label={"간사(장부) 번호"} type="number" />
+                <TextField variant="standard" {...register("payname")} label={"이름"} />
+                <TextField variant="standard" {...register("paynumber")} label={"번호"} type="number" />
               </Box>
             </Box>
             <Box className="row" ref={accountRef}>

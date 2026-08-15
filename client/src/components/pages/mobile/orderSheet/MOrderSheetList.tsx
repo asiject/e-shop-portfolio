@@ -84,8 +84,6 @@ export default function MOrderSheetList() {
     const {products} = result;
     setOrderSheet(
       products.map((product: Product) => {
-        //FIXME: product type 설정
-        console.log("product : ", product);
         return {
           productid: product.productid,
           title: product.title,
@@ -119,7 +117,6 @@ export default function MOrderSheetList() {
   };
 
   const handleOrdered = async (formData: any) => {
-    console.log("formData >> ", formData);
     await execute(async () => {
       const info = {
         status: formData.type == "pay" ? "PAYMENT" : "WAIT",
@@ -135,12 +132,10 @@ export default function MOrderSheetList() {
       const params = Object.assign(info, formData);
       // console.log("params & formData >>>", params);
       if (params.postcode == "") {
-        console.log("zonecode is empty");
         return;
       }
       // orders payment, delivery, buyer 정보 받아서 저장
-      const orderData = await axios.put(`/api/v1/user/${loginUser.userid}/order/${id}/status`, params);
-      console.log("order data : ", orderData.data);
+      await axios.put(`/api/v1/user/${loginUser.userid}/order/${id}/checkout`, params);
       if (params.addAddress === true) {
         // user_address DB에 유저 배송지 저장
         // { alias : addressNickname, postcode, address1, address2, phone, userid}
@@ -153,10 +148,9 @@ export default function MOrderSheetList() {
           phone: params.receiverPhone, // 받는 사람 연락처
         };
         // console.log("address >> ", address);
-        const addressData = await axios.post(`/api/v1/user/${loginUser.userid}/address`, address);
-        console.log("address Data : ", addressData.data);
+        await axios.post(`/api/v1/user/${loginUser.userid}/address`, address);
       }
-      // user_payment 에 페이공제 정보[장부명, 장부 번호] 저장
+      // user_payment 에 페이공제 정보 저장
       // { alias : payname, sabun: paynumber, userid}
       const payment = {
         userid: loginUser.userid,
@@ -164,8 +158,7 @@ export default function MOrderSheetList() {
         sabun: params.paynumber,
       };
       // console.log("payment >> ", payment);
-      const paymentData = await axios.post(`/api/v1/user/${loginUser.userid}/payment`, payment);
-      console.log("paymentData >> ", paymentData);
+      await axios.post(`/api/v1/user/${loginUser.userid}/payment`, payment);
       // 결과창으로 이동
       navigate(`/order/sheet/${id}/result`);
     });
@@ -487,10 +480,10 @@ export default function MOrderSheetList() {
                           <Box className="header">페이공제</Box>
                           <Box sx={{input: {border: "0 !important"}}}>
                             <Box>
-                              간사 이름(장부 이름) <TextField {...register("payname")} />
+                              이름 <TextField {...register("payname")} />
                             </Box>
                             <Box>
-                              간사 번호(장부 번호) <TextField {...register("paynumber")} />
+                              번호 <TextField {...register("paynumber")} />
                             </Box>
                           </Box>
                         </Box>

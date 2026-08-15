@@ -89,8 +89,7 @@ export default function MCartList() {
 
   const handleEditCart = async (userid: number, data: any) => {
     await execute(async () => {
-      const result = await axios.put(`/api/v1/cart/${userid}`, data);
-      console.log("Edit Cart result >> ", result);
+      await axios.put(`/api/v1/cart/${userid}`, data);
       // 수량 수정 후 선택된 상품의 총 금액만 다시 계산하여 반영함
       setTotalCost(selectItems.map((item: any) => item.count * item.cost).reduce((prevCost: number, nextCost: number) => prevCost + nextCost));
     });
@@ -173,13 +172,17 @@ export default function MCartList() {
                     userid: loginUser?.userid,
                     status: "TEMP",
                     products: selectItems.map(item => ({
-                      productid: item.pid,
+                      productid: item.productid ?? item.pid,
                       itemid: item.itemid,
                       option: item.option,
                       count: item.count,
                       cost: item.cost,
                     })),
                   };
+                  if (!params.products.length) {
+                    alert("주문할 상품을 선택하세요");
+                    return;
+                  }
                   handleTakeOrdered(params);
                 }}>
                 주문하기
@@ -224,6 +227,7 @@ function ListItem({item, selectItems, changeCheckbox, handleEditCart}: any) {
                     if (item.count > 1) {
                       item.count--;
                       setTick(t => t + 1);
+                      handleEditCart(item.userid, {userid: item.userid, pid: item.pid, itemid: item.itemid, option: item.option, count: item.count});
                     }
                   }}>
                   -
@@ -241,6 +245,7 @@ function ListItem({item, selectItems, changeCheckbox, handleEditCart}: any) {
                       item.count = 10000;
                       setTick(t => t + 1);
                     }
+                    handleEditCart(item.userid, {userid: item.userid, pid: item.pid, itemid: item.itemid, option: item.option, count: item.count});
                   }}>
                   +
                 </Button>
@@ -253,7 +258,7 @@ function ListItem({item, selectItems, changeCheckbox, handleEditCart}: any) {
               size="small"
               color="info"
               onClick={e => {
-                const data = {userid: item.userid, pid: item.pid, itemid: item.itemid, count: item.count};
+                const data = {userid: item.userid, pid: item.pid, itemid: item.itemid, option: item.option, count: item.count};
                 handleEditCart(item.userid, data);
               }}>
               수량 변경

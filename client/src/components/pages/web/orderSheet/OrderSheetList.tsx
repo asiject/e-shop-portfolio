@@ -7,6 +7,7 @@ import {Box, Table, TableBody, TableCell, TableHead, TableRow} from "@mui/materi
 import {userState} from "@recoils/user/state";
 import {useOrderSheetQuery} from "@recoils/order/query";
 import {numberFormat} from "@utils/Numaric";
+import {OrderLine} from "@utils/Types";
 import Loading from "@layout/Loading";
 import Error from "@layout/Error";
 import {Styles} from "@styles";
@@ -15,20 +16,17 @@ import OrderGeneralInformation from "./OrderGeneralInformation";
 export default function OrderSheetList() {
   const {id} = useParams();
   const loginUser = useRecoilValue(userState);
-  const [orderSheet, setOrderSheet] = useState([]);
+  const [orderSheet, setOrderSheet] = useState<OrderLine[]>([]);
   const [totalCost, setTotalCost] = useState(0);
   const [deliveryCost, setDeliveryCost] = useState(3000);
   const styles = Styles();
   const navigate = useNavigate();
   const {isLoading, isError, data, error} = useOrderSheetQuery({userid: loginUser?.userid, orderid: id || ""});
 
-  console.log("data >", data);
   useEffect(() => {
-    //FIXME: [SHOP-17] 비회원과 회원에 대한 방법
     if (loginUser) {
       if (data) {
         const products = data?.products;
-        console.log("products >", products);
         if (products?.length > 0) {
           setOrderSheet(
             products?.map((product: any) => {
@@ -58,24 +56,6 @@ export default function OrderSheetList() {
   if (isError) {
     return <Error error={error} />;
   }
-
-  // TODO: 직접수령 클릭하면 배송지 주소 대신 수령 주소로 변경
-  // TODO: 직접수령하면 수령 예정일을 적는 게 나을까?
-
-  // TODO: 기본 배송지가 없을 때 기본 배송지 설정 ~ 처음 기본 배송지 설정 => DB에서 기본 배송지를 어떻게 구분할까?
-  // 1) 기본 배송지가 없을 때 -> 현재 등록하는 주소가 기본 배송지로 설정
-  // 2) 신규 배송지로 설정하면 -> 신규 배송지 정보 등록
-  // TODO: 목록 중에 기본 배송지 설정하기
-
-  // TODO: 입력 정보 required 처리 받기 (axios.post / param)
-  // [필수 체크] 수령인, 전화번호, 우편 번호, 배송지 기본 주소(주소1), 배송지 상세 주소(주소2)
-  // 배송 메모(선택)
-
-  // TODO:  페이공제 require => 계좌입금을 누르면 페이공제 require 비활성화 |결제수단 1. 페이공제 -> 이름, 간사번호 /  2. 계좌 입금 (배송비 포함 금액)
-
-  // TODO:결제 수단 누르는 것에 따라 article 활성화 => UI도 신경써야함
-  // 배송비 활성화 / 비활성화
-  // 페이공제 정보 입력창 활성화 / 비활성화
 
   return (
     <Box sx={styles.orderWrapper}>

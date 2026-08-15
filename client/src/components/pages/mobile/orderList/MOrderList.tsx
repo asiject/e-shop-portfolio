@@ -16,10 +16,11 @@ import statusCheck from "@utils/StatusCheck";
 import Loading from "@layout/Loading";
 import Error from "@layout/Error";
 import {MStyles} from "@styles";
+import {OrderListRow} from "@utils/Types";
 
 export default function MOrderList() {
   // const [useOrderListQuery, setOrderListQuery] = useRecoilState(orderListQuery);
-  const [orderList, setOrderList] = useState([]);
+  const [orderList, setOrderList] = useState<OrderListRow[]>([]);
   const loginUser = useRecoilValue(userState);
   const navigate = useNavigate();
   const {isLoading, isError, data, error} = useOrderListQuery({userid: loginUser?.userid});
@@ -42,7 +43,7 @@ export default function MOrderList() {
   const orderListFunc = async (data: any) => {
     setOrderList(data);
   };
-  const handleShowDetail = (orderid: number) => {
+  const handleShowDetail = (orderid: string) => {
     navigate(`/m/order/${orderid}`);
   };
 

@@ -17,7 +17,7 @@ import dateFormat from "@utils/DateFormat";
 import statusCheck from "@utils/StatusCheck";
 import Loading from "@layout/Loading";
 import Error from "@layout/Error";
-import {User} from "@utils/Types";
+import {shopProductQnaHref} from "@utils/productQna";
 
 export default function OrderList() {
   const [orderList, setOrderList] = useState<Array<any>>([]);
@@ -26,7 +26,6 @@ export default function OrderList() {
   const styles = Styles();
   const {isLoading, isError, data, error} = useOrderListQuery({userid: loginUser?.userid});
 
-  console.log("data >", data);
   useEffect(() => {
     if (loginUser) {
       setOrderList(data);
@@ -191,10 +190,14 @@ function OrderedList({list}: {list: any}) {
               size="small"
               sx={{width: "100%", height: "38px", color: "#AAA"}}
               onClick={() => {
-                console.log("교환 반품 신청");
+                const first = list.products?.[0];
+                if (!first?.productid) {
+                  alert("상품 정보를 찾을 수 없습니다");
+                  return;
+                }
+                navigate(shopProductQnaHref(first.productid, {kind: "return", orderid: String(list.orderid)}));
               }}>
-              {/* TODO: 교환 반품 신청 */}
-              교환, 반품 신청
+              교환, 반품 문의
             </Button>
           </Box>
         </Box>
@@ -204,7 +207,6 @@ function OrderedList({list}: {list: any}) {
 }
 
 function ListItem({item}: {item: any}) {
-  console.log("item >", item);
   return (
     <Box sx={{display: "flex", marginTop: "20px"}}>
       <Box sx={{margin: "20px 20px 20px 0"}}>

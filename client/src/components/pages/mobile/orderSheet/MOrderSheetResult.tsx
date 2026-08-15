@@ -7,13 +7,12 @@ import {Box, Button, Table, TableBody, TableCell, TableRow} from "@mui/material"
 import {userState} from "@recoils/user/state";
 import {useOrderSheetResultQuery} from "@recoils/order/query";
 import {numberFormat} from "@utils/Numaric";
+import {OrderLine} from "@utils/Types";
 import {MStyles} from "@styles";
 
 export default function MOrderSheetResult() {
   const {id} = useParams();
-  // TODO: pay일 경우 query로 간사이름(장부명), 간사번호(장부번호) 받아와야함
-  // const [] = useRecoilState()
-  const [productList, setProductList] = useState([]);
+  const [productList, setProductList] = useState<OrderLine[]>([]);
   const resultRef = useRef<any>(null);
   const navigate = useNavigate();
   const loginUser = useRecoilValue(userState);
@@ -31,11 +30,9 @@ export default function MOrderSheetResult() {
   const orderSheetResultFunc = async (data: any) => {
     const params = {userid: loginUser.userid, orderid: id};
     // console.log("orderSheet Result : ", result);
-    const {products, payment, buyer, delivery} = data;
-    console.log("result : ", products, payment, buyer, delivery);
+    const {products} = data;
     setProductList(products);
     resultRef.current = data;
-    // TODO: THINKING POINT => STATUS 가 TEMP 가 아닌 것(결제 대기, 결제 완료, 혹은 그 이후 스탭)이면 orderSheetList? Query로 받아와도 되지 않을까? 쿼리 결과 확인하고 원하는 결과물이 나오면 해당 결과물 가져오기
   };
 
   return (
@@ -70,11 +67,7 @@ export default function MOrderSheetResult() {
               <TableRow>
                 <TableCell sx={MStyles.leftCellSize}>결제방식</TableCell>
                 <TableCell>
-                  {data && data?.payment?.type == "pay"
-                    ? //TODO: order_delivery에 간사명(ex : payname) 간사번호(ex: paynumber) 추가하고 아래 주석된 부분 풀고 수정하면 됨.
-                      // ? `[페이공제]\n 간사 이름(장부 이름) : ${result.payment.payname} 간사 번호(장부 번호) : ${result.payment.paynumber}`
-                      `[페이공제]\n 간사 이름(장부 이름) : 간사 번호(간사 번호) : `
-                    : "[계좌 이체]\n카카오뱅크 3333-1234456789"}
+                  {data && data?.payment?.type == "pay" ? "페이공제" : "[계좌 이체]\n카카오뱅크 3333-1234456789"}
                 </TableCell>
               </TableRow>
               <TableRow>

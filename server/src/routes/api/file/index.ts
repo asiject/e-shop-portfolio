@@ -34,7 +34,6 @@ export default async function (fastify: FastifyInstance) {
     const img_root = "public/temp";
     const filepath = img_root + "/" + filetype;
     const filesize = part.file.bytesRead;
-    console.log("parts >>", filesize, part);
     await addTempFile(fileid, filename, filepath, filesize, mimetype, filetype, sortno);
     await pump(part.file, fs.createWriteStream(filepath + "/" + fileid));
     return {fileid, filename};

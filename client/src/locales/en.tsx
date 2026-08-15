@@ -30,6 +30,7 @@ const en = {
   "menu.claim.return": "반송 관리",
   "menu.claim.cancel": "취소 관리",
   logout: "logout",
+  shop: "Shop",
   "room.lobby": "lobby",
   "room.chapel": "chapel",
   "room.meet": "meeting {no}",

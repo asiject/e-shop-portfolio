@@ -26,12 +26,11 @@ export default function Error({error}: any) {
           }
         })
         .catch(err => {
-          console.log("refreshToken err >", err);
+          console.error(err);
           return <Navigate to="/login" />;
         });
       return <Loading />;
     } else {
-      console.error(" loginUser 여기! ", error);
       return <Navigate to="/login" />;
     }
   }

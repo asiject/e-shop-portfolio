@@ -1,22 +1,15 @@
-import OrderBuyer from "@order/entity/OrderBuyer";
-import OrderDelivery from "@order/entity/OrderDelivery";
-import OrderPayment from "@order/entity/OrderPayment";
-import Orders from "@order/entity/Orders";
-import {getManager, txProcess} from "@lib/db";
-import {addOrders, editOrders, getUserOrders, getUserOrdersById} from "@order/service/userOrdersService";
+import {addOrders, getUserOrders, getUserOrdersById, saveOrderCheckout, updateUserOrderStatus} from "@order/service/userOrdersService";
 import {FastifyReply} from "fastify";
 import {FastifyInstance, FastifyRequest} from "fastify";
-import {UpdateResult} from "typeorm";
 
-// session token
 export default async function (fastify: FastifyInstance) {
   fastify.get("/", async (req: FastifyRequest<{Params: {userid: string}}>, reply: FastifyReply) => {
     const {userid} = req.params;
-    const orders: Orders[] = await getUserOrders(userid);
+    const orders = await getUserOrders(userid);
     reply.send(orders);
   });
 
-  fastify.get("/:orderid", async (req: FastifyRequest<{Params: Orders}>, reply: FastifyReply) => {
+  fastify.get("/:orderid", async (req: FastifyRequest<{Params: {userid: string; orderid: string}}>, reply: FastifyReply) => {
     const {userid, orderid} = req.params;
     const order = await getUserOrdersById(userid, orderid);
     reply.send(order);
@@ -24,15 +17,37 @@ export default async function (fastify: FastifyInstance) {
 
   fastify.post("/", async (req: FastifyRequest<{Params: {userid: string}; Body: {status: string; products: any}}>, reply: FastifyReply) => {
     const {userid} = req.params;
-    const {status, products} = req.body;
-    const order = await addOrders(userid, status, products);
-    reply.send(order);
+    const {status, products} = req.body ?? {};
+    if (!Array.isArray(products) || products.length === 0) {
+      return reply.code(400).send({message: "EMPTY_ORDER_PRODUCTS"});
+    }
+    try {
+      const order = await addOrders(userid, status, products);
+      reply.send(order);
+    } catch (err: any) {
+      const message = String(err?.message ?? "");
+      if (message.includes("EMPTY_ORDER_PRODUCTS") || message.includes("INVALID_ORDER_PRODUCT")) {
+        return reply.code(400).send({message: "EMPTY_ORDER_PRODUCTS"});
+      }
+      throw err;
+    }
   });
 
-  //TODO: 쪼개기 필요
-  //최종 success
   fastify.put(
     "/:orderid/status",
+    async (req: FastifyRequest<{Params: {userid: string; orderid: string}; Body: {status: string}}>, reply: FastifyReply) => {
+      const {userid, orderid} = req.params;
+      const {status} = req.body ?? {};
+      if (!status) {
+        return reply.code(400).send({message: "EMPTY_ORDER_STATUS"});
+      }
+      const result = await updateUserOrderStatus(userid, orderid, status);
+      reply.send(result);
+    },
+  );
+
+  fastify.put(
+    "/:orderid/checkout",
     async (
       req: FastifyRequest<{
         Params: {userid: string; orderid: string};
@@ -57,27 +72,11 @@ export default async function (fastify: FastifyInstance) {
       reply: FastifyReply,
     ) => {
       const {userid, orderid} = req.params;
-      const {status} = req.body;
-      const {buyername, buyerEmail, buyerPhone} = req.body;
-      const {type, price, charge, total} = req.body;
-      const {receiver, postcode, address1, address2, description, receiverEmail, receiverPhone} = req.body;
-
-      const manager = getManager();
-      const orders: Orders = manager.create(Orders, {userid, orderid, status});
-      const buyer: OrderBuyer = manager.create(OrderBuyer, {orderid, buyername, email: buyerEmail, phone: buyerPhone});
-      const payment: OrderPayment = manager.create(OrderPayment, {orderid, type, price, charge, total});
-      const delivery: OrderDelivery = manager.create(OrderDelivery, {
-        orders: {orderid},
-        receiver,
-        postcode,
-        address1,
-        address2,
-        email: receiverEmail,
-        phone: receiverPhone,
-        description,
-      });
-
-      const result: UpdateResult = await editOrders(orders, buyer, payment, delivery);
+      const body = req.body;
+      if (!body?.buyername || !body?.type) {
+        return reply.code(400).send({message: "EMPTY_CHECKOUT"});
+      }
+      const result = await saveOrderCheckout(userid, orderid, body);
       reply.send(result);
     },
   );

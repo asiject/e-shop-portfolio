@@ -26,7 +26,11 @@ function Init() {
   const messages = locales[locale];
   return (
     <GoogleOAuthProvider clientId={clientId}>
-      <BrowserRouter>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}>
         <IntlProvider locale={locale} messages={messages}>
           <ThemeProvider theme={theme}>
             <QueryClientProvider client={queryClient}>

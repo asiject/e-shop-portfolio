@@ -3,8 +3,8 @@ import {useSetRecoilState} from "recoil";
 
 import {fetchSessionUser, userState} from "@recoils/user/state";
 import ShopRoutes from "routes/shop/ShopRoutes";
-import AdminRoutes from "routes/admin/AdminRoutes";
 import Loading from "@layout/Loading";
+import AppSnackbar from "@layout/AppSnackbar";
 
 export default function App() {
   return <AppRoutes />;
@@ -35,7 +35,7 @@ function AppRoutes() {
   return (
     <>
       <ShopRoutes />
-      <AdminRoutes />
+      <AppSnackbar />
     </>
   );
 }

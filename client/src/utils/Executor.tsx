@@ -1,18 +1,12 @@
-export const execute = async (action: any) => {
+import {errorMessageFromUnknown, notifyError} from "@utils/notify";
+
+export const execute = async (action: () => Promise<void> | void) => {
   try {
-    if (typeof action == "function") {
+    if (typeof action === "function") {
       await action();
     }
-  } catch (error: any) {
-    if (error?.response) {
-      console.error(error?.response);
-      // const {
-      //   data: { message },
-      // } = error?.response;
-      // enqueueSnackbar(message, { variant: "error" });
-    } else {
-      console.error(error);
-      // enqueueSnackbar(error, { variant: "error" });
-    }
+  } catch (error: unknown) {
+    console.error(error);
+    notifyError(errorMessageFromUnknown(error));
   }
 };
