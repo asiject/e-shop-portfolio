@@ -168,6 +168,7 @@ export default function ProductWrite() {
           title: title.trim(),
           description: description.trim().slice(0, 100),
           thumbnail,
+          images,
           cost: Number(price) || 0,
           capacity: Number(stock) || 0,
           optionCnt: Number(stock) || 0,

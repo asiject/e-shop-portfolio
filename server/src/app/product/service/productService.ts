@@ -139,10 +139,12 @@ export async function editProduct(body: {
   optionCnt?: number;
   showyn?: string;
   editor?: string;
+  images?: string[] | {path?: string}[];
 }): Promise<UpdateResult> {
   return await txProcess(async manager => {
     const repository = manager.getRepository(Product);
-    const {id, title, description, thumbnail, cost, capacity, optionCnt, showyn, editor} = body;
+    const {id, title, description, thumbnail, cost, capacity, optionCnt, showyn, editor, images} = body;
+    const productId = Number(id);
     const patch: Partial<Product> = {};
     if (title !== undefined) patch.title = title;
     if (description !== undefined) patch.description = description;
@@ -152,7 +154,22 @@ export async function editProduct(body: {
     if (optionCnt !== undefined) patch.optionCnt = optionCnt;
     if (showyn !== undefined) patch.showyn = showyn;
     if (editor !== undefined) patch.editor = editor;
-    return await repository.update({id}, patch);
+    const result = await repository.update({id: productId}, patch);
+    // 한글 주석: 경로 문자열 배열일 때만 갤러리를 교체. 스토어 PUT의 ProductImage[]는 건드리지 않음
+    const imagePaths = Array.isArray(images) && images.every((path): path is string => typeof path === "string") ? images : null;
+    if (imagePaths) {
+      const imageRepository = manager.getRepository(ProductImage);
+      await imageRepository.delete({product: {id: productId}});
+      for (let i = 0; i < imagePaths.length; i++) {
+        if (!imagePaths[i]) continue;
+        await imageRepository.save({
+          path: imagePaths[i],
+          sortno: i + 1,
+          product: {id: productId},
+        });
+      }
+    }
+    return result;
   });
 }
 

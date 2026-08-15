@@ -29,6 +29,7 @@ export const putAdminProduct = (body: {
   optionCnt?: number;
   showyn?: string;
   editor?: string;
+  images?: string[];
 }) => api.put("/admin/product", body);
 
 export const deleteAdminProduct = (productid: number) => api.delete(`/admin/product/${productid}`);

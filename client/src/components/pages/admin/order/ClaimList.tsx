@@ -52,8 +52,8 @@ export default function ClaimList() {
     setQuery("")
   }, [type])
 
-  if (cancel.isLoading || ret.isLoading || change.isLoading) return <Loading />
-  if (cancel.isError || ret.isError || change.isError) return <Error />
+  if (active.isLoading) return <Loading />
+  if (active.isError) return <Error />
 
   const toggle = (order: AdminOrderRow) => {
     const idx = selected.findIndex(o => o.orderid === order.orderid)
