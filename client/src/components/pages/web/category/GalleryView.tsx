@@ -9,8 +9,8 @@ export default function GalleryView({list}: {list: any}) {
         display: "flex",
         overflow: "auto",
         flexWrap: "wrap",
-        marginLeft: "-5px",
-        marginRight: "-5px",
+        marginLeft: "-10px",
+        marginRight: "-10px",
       }}>
       {list?.map((item: any) => {
         return <CardForCategory key={item.productid} item={item} />;

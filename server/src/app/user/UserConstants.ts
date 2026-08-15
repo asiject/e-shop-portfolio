@@ -16,4 +16,8 @@ export enum LOGIN_TYPE {
   GOOGLE = "GOOGLE",
   KAKAO = "KAKAO",
   NAVER = "NAVER",
+  DEMO = "DEMO",
 }
+
+/** 원클릭 데모 로그인 역할 */
+export type DemoLoginRole = "USER" | "ADMIN";

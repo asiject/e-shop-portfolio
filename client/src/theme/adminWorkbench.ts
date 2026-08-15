@@ -1,0 +1,16 @@
+export const wb = {
+  rail: "#1c1917",
+  railText: "#e7e5e4",
+  railMute: "#a8a29e",
+  ink: "#1c1917",
+  mute: "#57534e",
+  line: "#e7e0d6",
+  bg: "#f4f1ec",
+  paper: "#fffcf8",
+  action: "#9a3412",
+  wait: "#c2410c",
+  ok: "#3f6212",
+  danger: "#9f1239",
+  top: 44,
+  railWidth: 240,
+} as const

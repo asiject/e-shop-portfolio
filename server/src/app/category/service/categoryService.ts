@@ -19,7 +19,6 @@ export async function addCategory(category: Category): Promise<Category> {
   return await txProcess(async manager => {
     const repository = manager.getRepository(Category);
     const result = await repository.save(category);
-    console.log("result >>", result);
     return result;
   });
 }

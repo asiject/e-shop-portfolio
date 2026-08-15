@@ -24,7 +24,5 @@ export async function getOrderList(userid: string) {
 }
 
 export async function getOrderDetail(userid: string, orderid: string) {
-  return await axiosProcess(async () => {
-    return await api.get(`/user/${userid}/order/${orderid}`);
-  });
+  return await api.get(`/user/${userid}/order/${orderid}`);
 }

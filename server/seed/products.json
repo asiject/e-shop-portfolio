@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1,
+    "title": "오리지널 블렌드 원두 200g",
+    "description": "미디엄 로스트, 견과류·카카오 노트",
+    "thumbnail": "/public/img/seed/product-01.jpg",
+    "cost": 18000,
+    "capacity": 50,
+    "optionCnt": 2,
+    "showyn": "Y",
+    "editor": "<p>가상 시드 상품입니다. 오리지널 블렌드 원두.</p>",
+    "images": [
+      {"sortno": 1, "path": "/public/img/seed/product-01.jpg"}
+    ],
+    "options": [
+      {
+        "optkey": "분쇄도",
+        "optvals": "홀빈,에스프레소,드립",
+        "items": [
+          {"itemkey": "분쇄도", "itemval": "홀빈", "price": 0, "capacity": 20, "useyn": "Y"},
+          {"itemkey": "분쇄도", "itemval": "에스프레소", "price": 0, "capacity": 15, "useyn": "Y"},
+          {"itemkey": "분쇄도", "itemval": "드립", "price": 0, "capacity": 15, "useyn": "Y"}
+        ]
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "디카페인 콜드브루 1L",
+    "description": "저온 추출, 카페인 거의 없음",
+    "thumbnail": "/public/img/seed/product-02.jpg",
+    "cost": 12000,
+    "capacity": 30,
+    "optionCnt": 1,
+    "showyn": "Y",
+    "editor": "<p>가상 시드 상품입니다. 디카페인 콜드브루.</p>",
+    "images": [
+      {"sortno": 1, "path": "/public/img/seed/product-02.jpg"}
+    ],
+    "options": [
+      {
+        "optkey": "세트",
+        "optvals": "단품,2병세트",
+        "items": [
+          {"itemkey": "세트", "itemval": "단품", "price": 0, "capacity": 20, "useyn": "Y"},
+          {"itemkey": "세트", "itemval": "2병세트", "price": 3000, "capacity": 10, "useyn": "Y"}
+        ]
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "핸드드립 드리퍼 세트",
+    "description": "세라믹 드리퍼 + 필터 40매",
+    "thumbnail": "/public/img/seed/product-03.jpg",
+    "cost": 29000,
+    "capacity": 20,
+    "optionCnt": 2,
+    "showyn": "Y",
+    "editor": "<p>가상 시드 상품입니다. 핸드드립 세트.</p>",
+    "images": [
+      {"sortno": 1, "path": "/public/img/seed/product-03.jpg"}
+    ],
+    "options": [
+      {
+        "optkey": "색상",
+        "optvals": "화이트,블랙",
+        "items": [
+          {"itemkey": "색상", "itemval": "화이트", "price": 0, "capacity": 10, "useyn": "Y"},
+          {"itemkey": "색상", "itemval": "블랙", "price": 0, "capacity": 10, "useyn": "Y"}
+        ]
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "title": "시그니처 머그 350ml",
+    "description": "매트 마감, 전자레인지 가능",
+    "thumbnail": "/public/img/seed/product-04.jpg",
+    "cost": 15000,
+    "capacity": 40,
+    "optionCnt": 0,
+    "showyn": "Y",
+    "editor": "<p>가상 시드 상품입니다. 시그니처 머그.</p>",
+    "images": [
+      {"sortno": 1, "path": "/public/img/seed/product-04.jpg"}
+    ],
+    "options": []
+  }
+]

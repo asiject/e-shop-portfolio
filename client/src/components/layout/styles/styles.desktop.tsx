@@ -1,4 +1,4 @@
-const primaryColor = "#9ac66d";
+const primaryColor = "#1A120B";
 // const primaryColor = "#f9c1ca";
 export default {
   //GNB
@@ -36,7 +36,7 @@ export default {
     paddingLeft: 0,
     width: "100%",
     li: {
-      borderBottom: "2px solid palegreen",
+      borderBottom: "2px solid #1A120B",
       margin: "0 2px",
     },
   },
@@ -129,9 +129,11 @@ export default {
     margin: "0 auto",
     display: "flex",
     paddingLeft: "15px",
-    // marginTop: "50px",
-    // marginBottom: "13px",
-    div: {fontSize: "22px", fontWeight: "bold"},
+    fontFamily: '"Archivo Narrow", "Noto Sans KR", sans-serif',
+    fontSize: "22px",
+    fontWeight: 700,
+    letterSpacing: "0.06em",
+    color: "#1A120B",
   },
   newGoods: {
     display: "flex",
@@ -205,6 +207,8 @@ export default {
     width: "25%",
     display: "flex",
     flexDirection: "column",
+    padding: "0 10px",
+    boxSizing: "border-box",
     a: {textDecoration: "none"},
   },
   cardContent: {
@@ -212,7 +216,7 @@ export default {
     width: "100%",
     img: {width: "226px", height: "226px", display: "block", margin: "0 auto"},
     "div strong": {
-      color: "navy",
+      color: "#1A120B",
     },
     "div:last-child": {
       overflow: "hidden",
@@ -246,6 +250,9 @@ export default {
   categoryTitle: {
     fontSize: "22px",
     fontWeight: "bold",
+    fontFamily: '"Archivo Narrow", "Noto Sans KR", sans-serif',
+    letterSpacing: "0.06em",
+    color: "#1A120B",
   },
   // ListView
   listViewBox: {
@@ -254,75 +261,59 @@ export default {
   },
   // PRODUCT
   productBox: {
-    display: "flex",
-    margin: "40px auto 20px",
-    border: "1px solid #ededed",
-    backgroundColor: "#FFF",
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr) minmax(320px, 420px)",
+    margin: "40px auto 28px",
+    border: "2px solid #1A120B",
+    backgroundColor: "#F3E6C9",
   },
   productLeft: {
-    width: "510px",
+    minWidth: 0,
     "a:hover": {background: "none"},
-    img: {width: "510px", height: "510px"},
   },
   productRight: {
-    width: "419px",
-    padding: "30px 40px",
-    borderLeft: "1px solid #ededed",
+    minWidth: 0,
+    padding: "28px 24px",
+    borderLeft: "2px solid #1A120B",
   },
   productPrice: {
-    display: "flex",
-    marginBottom: "10px",
-    "> div": {
-      display: "flex",
-      marginLeft: "auto",
-      alignItems: "center",
-      "div + div": {marginLeft: "10px"},
-    },
+    margin: "8px 0 0",
+    fontFamily: '"Spline Sans Mono", ui-monospace, monospace',
+    fontSize: "22px",
+    fontWeight: 600,
+    fontVariantNumeric: "tabular-nums",
   },
   productTotalValues: {
     display: "flex",
-    justifyContent: "flex-end",
-    margin: "10px 0",
+    justifyContent: "space-between",
+    alignItems: "baseline",
+    margin: "16px 0 0",
+    paddingTop: "16px",
+    borderTop: "2px solid #1A120B",
   },
   productStock: {
     fontSize: "14px",
-    display: "flex",
-    alignItems: "center",
-    marginRight: "1px",
-    "> div": {
-      backgroundColor: "#e2e2e2",
-      span: {
-        paddingRight: "12px",
-        marginRight: "1px",
-        backgroundColor: "#ffffff",
-      },
-    },
+    color: "#4A341F",
+    fontFamily: '"Spline Sans Mono", ui-monospace, monospace',
+    fontVariantNumeric: "tabular-nums",
   },
   productCost: {
-    backgroundColor: "#ffffff",
-    paddingLeft: "12px",
-    fontSize: "24px",
-    color: "#6b90dc",
+    fontFamily: '"Spline Sans Mono", ui-monospace, monospace',
+    fontSize: "22px",
+    fontWeight: 600,
+    fontVariantNumeric: "tabular-nums",
+    color: "#1A120B",
   },
   productBtnArea: {
-    marginTop: "10px",
+    marginTop: "16px",
     display: "flex",
-    button: {
-      padding: 0,
-    },
-    "button + button": {marginLeft: "5px"},
-    "button div": {
-      display: "block",
-      width: "100%",
-      padding: "8px 0",
-    },
+    gap: "8px",
   },
   productOrderBtn: {
-    flexGrow: 3,
-    padding: 0,
+    flex: 2,
   },
   productCartBtn: {
-    flexGrow: 1,
+    flex: 1,
   },
   package: {
     margin: "10px 0",
@@ -347,24 +338,21 @@ export default {
   },
   //tab Product
   tabProduct: {
-    width: 998,
-    border: "1px solid #dee0e2",
-    maxHeight: 275,
+    width: 1024,
+    maxHeight: 320,
     overflowY: "auto",
     overflowX: "hidden",
-    padding: "0px 40px",
+    padding: "16px 24px",
     display: "flex",
+    backgroundColor: "#F3E6C9",
+    borderTop: "2px solid #1A120B",
     "> div": {
       width: "100%",
       height: "fit-content",
-      padding: "10px",
     },
   },
   productInfoArea: {
     width: "100%",
-    strong: {
-      fontSize: "20px",
-    },
   },
   optionArea: {
     width: "100%",
@@ -387,19 +375,20 @@ export default {
     svg: {marginRight: "10px"},
   },
   productTabContainer: {
-    display: "none",
+    display: "flex",
     flexDirection: "column",
     position: "fixed",
     top: 0,
     left: 0,
     width: "100%",
-    borderBottom: "1px solid black",
-    background: "#fff",
+    borderBottom: "2px solid #1A120B",
+    backgroundColor: "#F3E6C9",
     zIndex: 110,
     "> ul": {width: 1024, borderBottom: 0},
     "> div": {
       display: "flex",
       justifyContent: "space-between",
+      alignItems: "center",
       width: "1024px",
       margin: "12px auto",
     },
@@ -407,17 +396,25 @@ export default {
   tabThumbnail: {
     width: 50,
     height: 50,
+    flexShrink: 0,
     display: "flex",
     alignItems: "center",
-    img: {width: "100%"},
+    overflow: "hidden",
+    backgroundColor: "#2A1A10",
+    img: {width: "100%", height: "100%", objectFit: "cover"},
   },
   tabInfo: {
     width: "calc(100% - 180px)",
     margin: "0 20px",
     display: "flex",
     flexDirection: "column",
-    div: {fontSize: "18px"},
-    "div:last-child": {fontSize: "14px"},
+    gap: "4px",
+    "div:first-of-type": {fontSize: "15px", fontWeight: 800, lineHeight: 1.3},
+    "div:last-child": {
+      fontFamily: '"Spline Sans Mono", ui-monospace, monospace',
+      fontSize: "14px",
+      fontVariantNumeric: "tabular-nums",
+    },
   },
   tabOpen: {
     width: "90px",
@@ -428,48 +425,55 @@ export default {
     height: "40px",
     display: "flex",
     justifyContent: "space-around",
-    borderBottom: "1px solid black",
+    border: "2px solid #1A120B",
+    borderBottomWidth: "2px",
     position: "sticky",
     margin: "0 auto",
     zIndex: 100,
     top: 0,
-    backgroundColor: "#fff",
+    backgroundColor: "#F3E6C9",
+    listStyle: "none",
+    padding: 0,
     button: {
       width: "100%",
       height: "100%",
       textDecoration: "none",
       padding: "12px 0",
+      color: "#1A120B",
+      fontWeight: 700,
     },
     li: {
       width: "100%",
       textAlign: "center",
-      backgroundColor: "#f3f5f7",
+      backgroundColor: "#F3E6C9",
+      borderRight: "2px solid #1A120B",
+      "&:last-child": {borderRight: 0},
     },
   },
   // TackBack 반품 정보
   takeBack: {
     fontSize: "14px",
     thead: {
-      borderTop: "solid black 1px",
+      borderTop: "solid #1A120B 2px",
     },
     ol: {
       paddingInlineStart: "16px",
     },
     span: {
       fontSize: "12px",
-      color: "#8f8f8f",
+      color: "#4A341F",
     },
   },
   // CARTLIST + ORDER
   orderWrapper: {
-    backgroundColor: "#ebebeb",
+    backgroundColor: "#B48445",
   },
   // CARTLIST
   orderBox: {
-    backgroundColor: "#ffffff",
-    border: "1px solid #e0e0e0",
+    backgroundColor: "#F3E6C9",
+    border: "2px solid #1A120B",
     padding: "20px 40px",
-    borderRadius: "20px",
+    borderRadius: 0,
     margin: "80px 0",
   },
   cartTitle: {
@@ -562,9 +566,10 @@ export default {
   },
   orderSheetBottomBox: {
     maxWidth: "1024px",
-    backgroundColor: "#ffffff",
-    borderRadius: "20px",
+    backgroundColor: "#F3E6C9",
+    borderRadius: 0,
     marginTop: "10px",
+    border: "2px solid #1A120B",
   },
   orderSheetDeliveryBox: {
     padding: "30px 40px",
@@ -626,8 +631,8 @@ export default {
   },
   orderSheetOrderBtn: {
     width: "100%",
-    backgroundColor: "#9ac66d !important",
-    color: "#fff !important",
+    backgroundColor: "#1A120B !important",
+    color: "#F3E6C9 !important",
     textAlign: "center",
     padding: "10px",
     cursor: "pointer",

@@ -1,30 +1,41 @@
 import {txProcess} from "@lib/db";
 import Orders from "@order/entity/Orders";
+import {In} from "typeorm";
+
+const orderRelations = {buyer: true, products: {product: true}} as const;
 
 export async function getOrders(): Promise<Orders[]> {
   return await Orders.find();
 }
-//TODO: select 어떻게 구성해야하는지... join? 직접해야하나?
+
 export async function getOrdersByComplete(): Promise<Orders[]> {
-  return await Orders.createQueryBuilder()
-    .select("orderid, buyerid, userid, status, createdate, updatedate")
-    .where("status in (:...status)", {status: ["COMPLETE", "CANCEL", "RETURN", "CHANGE"]})
-    .execute();
+  return await Orders.find({
+    where: {status: In(["COMPLETE", "CANCEL", "RETURN", "CHANGE"])},
+    relations: orderRelations,
+    order: {createdate: "DESC"},
+  });
 }
+
 export async function getOrdersByStatus(status: string): Promise<Orders[]> {
-  return await Orders.find({where: {status}});
+  return await Orders.find({
+    where: {status},
+    relations: orderRelations,
+    order: {createdate: "DESC"},
+  });
 }
 
 export async function getOrdersByShipment(): Promise<Orders[]> {
-  return await Orders.createQueryBuilder()
-    .select("orderid, buyerid, userid, status, createdate, updatedate")
-    .where("status in (:...status)", {status: ["PAYMENT"]})
-    .execute();
+  return await Orders.find({
+    where: {status: In(["PAYMENT"])},
+    relations: orderRelations,
+    order: {createdate: "DESC"},
+  });
 }
 
 export async function getOrdersById(orderid: string): Promise<Orders | null> {
   return await Orders.findOne({where: {orderid}, relations: {products: true}});
 }
+
 export async function editOrdersStatus(ids: string[], status: string): Promise<number> {
   return await txProcess(async manager => {
     const repository = manager.getRepository(Orders);

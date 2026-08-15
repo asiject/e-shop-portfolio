@@ -6,9 +6,10 @@ import {Box} from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import CallIcon from "@mui/icons-material/Call";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import {styles} from "../../../layout/styles";
+import {Styles} from "@styles";
 
-export default function Location({open, setOpen}:any) {
+export default function Location({open, setOpen}: {open: boolean; setOpen: (open: boolean) => void}) {
+  const styles = Styles();
   const handleClose = () => {
     setOpen(false);
   };

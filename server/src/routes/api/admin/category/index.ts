@@ -39,9 +39,7 @@ export default async function (fastify: FastifyInstance) {
   });
   fastify.post("/", async (req: FastifyRequest<{Body: Category}>, reply: FastifyReply) => {
     const categoryVO = req.body;
-    console.log("category >>", categoryVO);
     const category = await addCategory(categoryVO);
-    console.log("category >>", categoryVO, category);
     reply.send(category);
   });
   fastify.delete("/:id", async (req: FastifyRequest<{Params: {id: number}}>, reply: FastifyReply) => {
@@ -52,7 +50,6 @@ export default async function (fastify: FastifyInstance) {
 
   fastify.get("/type/:typeid", async (req: FastifyRequest<{Params: {typeid: string}}>, reply: FastifyReply) => {
     const {typeid} = req.params;
-    console.log("typeid >", typeid);
     const categories: Category[] = await getCategoryListByType(typeid);
     reply.send(categories);
   });

@@ -6,30 +6,43 @@ import CheckedList from "./list/CheckedList";
 import AdminGnb from "@layout/AdminGnb";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import {getCategoryListQuery} from "@recoils/category/query";
+import {useCategoryListQuery} from "@recoils/category/query";
 import AddIcon from "@mui/icons-material/Add";
 import AddCategoryDialog from "./dialog/AddCategoryDialog";
-import {putCategoryUseYn} from "@recoils/category/axios";
+import {postCategory, putCategoryUseYn} from "@recoils/category/axios";
+import {useQueryClient} from "react-query";
 
 export default function CategoryList() {
+  const queryClient = useQueryClient();
   const [selected, setSelected]: any = useState([]);
   const [open, setOpen] = useState(false);
   const [list, setList]: any = useState([]);
-  const {isLoading, isError, data, error} = getCategoryListQuery();
+  const {isLoading, isError, data, error} = useCategoryListQuery();
+
   useEffect(() => {
     if (data) {
       setList(data);
     }
   }, [data]);
+
   if (isLoading) {
     return <Loading />;
   }
   if (isError) {
     return <Error error={error} />;
   }
-  const handleAddItem = (item: any) => {
-    console.log("item >>", item);
-    // setList(item);
+
+  const handleAddItem = async (item: {title: string; type: string; link: string}) => {
+    const sortno = (list?.length || 0) + 1;
+    const {data: created} = await postCategory({
+      title: item.title,
+      type: item.type,
+      link: item.link || "",
+      sortno,
+      useyn: "Y",
+    });
+    setList((prev: any[]) => [...prev, created]);
+    queryClient.invalidateQueries("getCategoryList");
   };
 
   const handleItemUseYn = async (useyn: string) => {
@@ -37,7 +50,6 @@ export default function CategoryList() {
       return {id: item?.id, useyn};
     });
     await putCategoryUseYn(categories);
-    // 선택한 놈들 useyn 변경도 같이 해야함.
     let selectItems = list;
     for (const obj of selected) {
       const idx = selectItems?.findIndex((item: any) => item?.id == obj?.id);
@@ -50,6 +62,7 @@ export default function CategoryList() {
     setList([...selectItems]);
     setSelected([]);
   };
+
   return (
     <AdminGnb RightButtons={<RightButtons selected={selected} setOpen={setOpen} handleItemUseYn={handleItemUseYn} />}>
       <MainPane list={list} selected={selected} setSelected={setSelected} />
@@ -57,18 +70,12 @@ export default function CategoryList() {
     </AdminGnb>
   );
 }
-//미선택 > 카테고리 추가...
-/*
-  > 카테고리 수정/삭제(상세)
-            미사용/사용
-            카테고리에 상품 추가
-*/
+
 function RightButtons({selected, setOpen, handleItemUseYn}: any) {
-  console.log("selected >", selected);
   const buttonList = [
     selected?.length == 0 && (
       <Tooltip key={"add"} title="추가">
-        <IconButton edge="end" sx={{color: "white"}} onClick={() => setOpen(true)}>
+        <IconButton edge="end" sx={{color: "inherit"}} onClick={() => setOpen(true)}>
           <AddIcon />
         </IconButton>
       </Tooltip>
@@ -77,7 +84,7 @@ function RightButtons({selected, setOpen, handleItemUseYn}: any) {
       <Tooltip key={"usey"} title="사용">
         <IconButton
           edge="end"
-          sx={{color: "white"}}
+          sx={{color: "inherit"}}
           onClick={() => {
             handleItemUseYn("Y");
           }}>
@@ -89,7 +96,7 @@ function RightButtons({selected, setOpen, handleItemUseYn}: any) {
       <Tooltip key={"usen"} title="미사용">
         <IconButton
           edge="end"
-          sx={{color: "white"}}
+          sx={{color: "inherit"}}
           onClick={() => {
             handleItemUseYn("N");
           }}>
@@ -101,6 +108,7 @@ function RightButtons({selected, setOpen, handleItemUseYn}: any) {
 
   return <>{buttonList}</>;
 }
+
 function MainPane({list, selected, setSelected}: any) {
-  return <CheckedList list={list} selected={selected} setSelected={setSelected} />;
+  return <CheckedList key={(list ?? []).map((i: any) => i?.id).join("-") || "empty"} list={list} selected={selected} setSelected={setSelected} />;
 }

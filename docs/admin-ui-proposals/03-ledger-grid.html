@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>C. 장부 그리드 — E샵 관리자</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+      :root {
+        --ink: #09090b;
+        --mute: #52525b;
+        --line: #e4e4e7;
+        --bg: #fff;
+        --sel: #e4e4ff;
+        --action: #09090b;
+        --rail: 52px;
+        --top: 36px;
+        --bar: 36px;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; }
+      body {
+        font-family: Pretendard, "Noto Sans KR", sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        font-size: 12px;
+        line-height: 1.3;
+      }
+      ::selection { background: #d4d4f5; }
+      :focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+      .skip {
+        position: absolute; left: 8px; top: -48px; z-index: 80;
+        background: #fff; color: var(--ink); padding: 8px 12px; font-weight: 650;
+      }
+      .skip:focus { top: 8px; }
+      button, input, select { font: inherit; color: inherit; }
+      a { color: inherit; text-decoration: none; }
+      .icon { width: 18px; height: 18px; display: block; }
+
+      .app {
+        display: grid;
+        grid-template-columns: var(--rail) 1fr;
+        grid-template-rows: var(--top) 1fr var(--bar);
+        min-height: 100%;
+      }
+      .rail {
+        grid-row: 1 / span 2;
+        border-right: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 8px 0;
+        gap: 4px;
+        background: #fafafa;
+      }
+      .rail a, .rail button {
+        width: 36px; height: 36px;
+        display: grid; place-items: center;
+        border: 0; background: transparent; cursor: pointer; color: var(--mute);
+      }
+      .rail a[aria-current="page"] { color: var(--ink); background: #e4e4e7; }
+      .top {
+        display: flex; align-items: center; gap: 8px;
+        padding: 0 8px;
+        border-bottom: 1px solid var(--line);
+      }
+      .crumb { font-weight: 700; letter-spacing: -0.02em; }
+      .top input, .top select {
+        height: 24px; border: 1px solid var(--line); padding: 0 6px; background: #fff;
+      }
+      .btn {
+        height: 24px; padding: 0 8px; border: 1px solid var(--ink); background: #fff; cursor: pointer;
+      }
+      .btn-primary { background: var(--ink); color: #fff; }
+      .btn:disabled { border-color: #a1a1aa; color: #a1a1aa; background: #fff; cursor: not-allowed; }
+      .btn-primary:disabled { background: #a1a1aa; color: #fff; border-color: #a1a1aa; }
+      .status { margin-left: auto; color: var(--mute); font-variant-numeric: tabular-nums; }
+
+      .sheet { overflow: auto; min-width: 0; }
+      table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+      th, td {
+        border-right: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        padding: 4px 8px;
+        text-align: left;
+        white-space: nowrap;
+      }
+      th {
+        position: sticky; top: 0;
+        background: #f4f4f5;
+        font-weight: 650;
+        z-index: 1;
+      }
+      td:first-child, th:first-child { position: sticky; left: 0; background: #fff; z-index: 2; }
+      th:first-child { background: #f4f4f5; z-index: 3; }
+      tbody tr:nth-child(even) td { background: #fafafa; }
+      tbody tr:nth-child(even) td:first-child { background: #fafafa; }
+      tbody tr[aria-selected="true"] td,
+      tbody tr[aria-selected="true"] td:first-child { background: var(--sel); }
+      tbody tr:hover td, tbody tr:hover td:first-child { background: #f4f4f5; }
+      tbody tr[aria-selected="true"]:hover td { background: #dcdcff; }
+      .num { text-align: right; }
+      .empty { padding: 32px; color: var(--mute); }
+
+      .proposal {
+        grid-column: 1 / -1;
+        display: flex; align-items: center; gap: 10px;
+        padding: 0 12px;
+        border-top: 1px solid var(--line);
+        color: var(--mute);
+      }
+      .proposal .on { color: var(--ink); font-weight: 700; }
+      .proposal a:hover { text-decoration: underline; }
+
+      @media (max-width: 800px) {
+        .app { grid-template-columns: 1fr; }
+        .rail { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      THESIS: 데이터가 지면이다. 카드·여백·큰 숫자를 거부한다.
+      OWN-WORLD: 헤어라인 그리드, 아이콘 레일 52px, 먹색 버튼, 행 높이 ~28px.
+      STORY: 행을 고르고 상태를 셀 단위로 바꾼다.
+      FIRST VIEWPORT: 레일 + 수식줄 툴바 + 전체폭 표.
+      FORM: 장부/ERP 시트. FINISH: 견본 — 방향 선택 전.
+    -->
+    <a class="skip" href="#main">본문으로</a>
+    <div class="app">
+      <nav class="rail" aria-label="관리 메뉴">
+        <a href="#" title="대시보드" aria-label="대시보드">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>
+        </a>
+        <a href="#" title="주문" aria-current="page" aria-label="주문">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"><path d="M7 7h13M7 12h13M7 17h13M4 7h.01M4 12h.01M4 17h.01"/></svg>
+        </a>
+        <a href="#" title="배송" aria-label="배송">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"><path d="M3 7h11v10H3zM14 10h5l2 3v4h-7zM6 20h.01M17 20h.01"/></svg>
+        </a>
+        <a href="#" title="클레임" aria-label="클레임">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"><path d="M4 12h16M12 4v16"/></svg>
+        </a>
+        <a href="#" title="상품" aria-label="상품">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"><path d="M4 8h16v12H4zM8 8V6h8v2"/></svg>
+        </a>
+        <a href="#" title="카테고리" aria-label="카테고리">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"><path d="M4 20V8l8-4 8 4v12H4z"/></svg>
+        </a>
+        <a href="#" title="정책" aria-label="정책">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"><path d="M7 4h10v16H7zM10 8h4M10 12h4"/></svg>
+        </a>
+      </nav>
+      <div class="top">
+        <span class="crumb">주문</span>
+        <select id="tab" aria-label="상태 필터">
+          <option value="all">전체</option>
+          <option value="WAIT">대기</option>
+          <option value="PAYMENT">결제완료</option>
+          <option value="COMPLETE">완료</option>
+          <option value="CANCEL">취소</option>
+        </select>
+        <input id="filter" type="search" placeholder="찾기" aria-label="찾기" />
+        <select id="next-status" aria-label="변경할 상태">
+          <option value="PAYMENT">결제완료</option>
+          <option value="COMPLETE">완료</option>
+          <option value="CANCEL">취소</option>
+          <option value="RETURN">반품</option>
+          <option value="CHANGE">교환</option>
+        </select>
+        <button class="btn btn-primary" type="button" id="apply" disabled>적용</button>
+        <span class="status" id="status">6행</span>
+      </div>
+      <main class="sheet" id="main">
+        <table>
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="all" aria-label="모두 선택" /></th>
+              <th>A 주문번호</th>
+              <th>B 시각</th>
+              <th>C 상품</th>
+              <th>D 옵션</th>
+              <th>E 금액</th>
+              <th>F 상태</th>
+              <th>G 주문자</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div class="empty" id="empty" hidden>조건에 맞는 행이 없습니다.</div>
+      </main>
+      <div class="proposal">
+        <span class="on">C 장부 그리드</span>
+        <a href="index.html">비교</a>
+        <a href="01-dense-console.html">A</a>
+        <a href="02-queue-workbench.html">B</a>
+        <a href="04-inspector-split.html">D</a>
+      </div>
+    </div>
+    <script>
+      const DATA = [
+        { id: "20250814-1001", time: "14:02", product: "오리지널 블렌드 원두 200g", option: "분쇄도 · 홀빈", price: 18000, status: "WAIT", buyer: "김민준" },
+        { id: "20250814-1002", time: "13:41", product: "디카페인 콜드브루 1L", option: "세트 · 단품", price: 12000, status: "WAIT", buyer: "이서연" },
+        { id: "20250814-1003", time: "13:18", product: "핸드드립 드리퍼 세트", option: "색상 · 블랙", price: 29000, status: "PAYMENT", buyer: "박도윤" },
+        { id: "20250814-1004", time: "12:55", product: "시그니처 머그 350ml", option: "—", price: 15000, status: "WAIT", buyer: "최하은" },
+        { id: "20250814-1005", time: "11:20", product: "오리지널 블렌드 원두 200g", option: "분쇄도 · 드립", price: 18000, status: "CANCEL", buyer: "정우진" },
+        { id: "20250814-0998", time: "어제", product: "디카페인 콜드브루 1L", option: "세트 · 2병세트", price: 15000, status: "COMPLETE", buyer: "한소희" },
+      ];
+      const LABEL = { WAIT: "대기", PAYMENT: "결제완료", COMPLETE: "완료", CANCEL: "취소", RETURN: "반품", CHANGE: "교환" };
+      let selected = new Set();
+      const rowsEl = document.getElementById("rows");
+      const empty = document.getElementById("empty");
+      const apply = document.getElementById("apply");
+      const all = document.getElementById("all");
+      const filter = document.getElementById("filter");
+      const tab = document.getElementById("tab");
+
+      function visible() {
+        const q = filter.value.trim();
+        const t = tab.value;
+        return DATA.filter((r) => (t === "all" || r.status === t) && (!q || `${r.id}${r.product}${r.buyer}`.includes(q)));
+      }
+      function won(n) { return n.toLocaleString("ko-KR"); }
+      function render() {
+        const list = visible();
+        rowsEl.innerHTML = list.map((r) => `
+          <tr data-id="${r.id}" aria-selected="${selected.has(r.id)}">
+            <td><input type="checkbox" ${selected.has(r.id) ? "checked" : ""} aria-label="${r.id}" /></td>
+            <td>${r.id}</td>
+            <td>${r.time}</td>
+            <td>${r.product}</td>
+            <td>${r.option}</td>
+            <td class="num">${won(r.price)}</td>
+            <td>${LABEL[r.status]}</td>
+            <td>${r.buyer}</td>
+          </tr>
+        `).join("");
+        empty.hidden = list.length > 0;
+        document.querySelector("table").hidden = list.length === 0;
+        document.getElementById("status").textContent = `${list.length}행 · 선택 ${selected.size}`;
+        apply.disabled = selected.size === 0;
+        all.checked = list.length > 0 && list.every((r) => selected.has(r.id));
+      }
+      rowsEl.addEventListener("change", (e) => {
+        const tr = e.target.closest("tr");
+        if (!tr) return;
+        if (e.target.checked) selected.add(tr.dataset.id); else selected.delete(tr.dataset.id);
+        render();
+      });
+      all.addEventListener("change", () => {
+        visible().forEach((r) => { if (all.checked) selected.add(r.id); else selected.delete(r.id); });
+        render();
+      });
+      filter.addEventListener("input", render);
+      tab.addEventListener("change", () => { selected.clear(); render(); });
+      apply.addEventListener("click", () => {
+        const next = document.getElementById("next-status").value;
+        DATA.forEach((r) => { if (selected.has(r.id)) r.status = next; });
+        selected.clear();
+        render();
+      });
+      render();
+    </script>
+  </body>
+</html>

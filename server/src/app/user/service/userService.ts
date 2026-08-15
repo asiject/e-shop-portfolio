@@ -11,7 +11,12 @@ export async function getAdminUserList() {
   return await User.find({where: {roles: {role: {roleid: In(["ADMIN"])}}}, relations: {logins: true}});
 }
 export async function getUserInfo(userid: string): Promise<User | null> {
-  return await User.findOne({where: {userid}});
+  const user = await User.findOne({where: {userid}, relations: {roles: {role: true}}});
+  if (user) {
+    const adminRole = user.roles?.find(({role}) => role.roleid === "ADMIN");
+    user.isAdmin = Boolean(adminRole);
+  }
+  return user;
 }
 export async function addUser(params: UserRegisterProps) {
   return await txProcess(async manager => {

@@ -1,4 +1,4 @@
-const primaryColor = "#9ac66d";
+const primaryColor = "#1A120B";
 export default {
   //MGnb
   mgnb: {
@@ -7,7 +7,7 @@ export default {
     height: "80px",
     flexDirection: "column",
     position: "sticky",
-    backgroundColor: "#fff",
+    backgroundColor: "#F3E6C9",
     top: 0,
     zIndex: "1000",
   },
@@ -84,7 +84,7 @@ export default {
   menubar: {
     width: "100%",
     height: "40px",
-    backgroundColor: "#fff",
+    backgroundColor: "#F3E6C9",
   },
   menulist: {
     display: "-webkit-box",
@@ -120,6 +120,16 @@ export default {
     display: "flex",
     flexDirection: "column",
     margin: "0 auto",
+    padding: "8px 12px 40px",
+    boxSizing: "border-box",
+  },
+  newGoodsHeader: {
+    margin: "8px 4px 16px",
+    fontFamily: '"Archivo Narrow", "Noto Sans KR", sans-serif',
+    fontSize: "20px",
+    fontWeight: 700,
+    letterSpacing: "0.06em",
+    color: "#1A120B",
   },
   // COMMON
   none: {
@@ -168,7 +178,7 @@ export default {
       width: "100%",
     },
     "div strong": {
-      color: "navy",
+      color: "#1A120B",
     },
   },
   cardInfo: {
@@ -201,81 +211,57 @@ export default {
     width: "100%",
     display: "flex",
     flexDirection: "column",
-    // margin: "-1px 0 20px",
-    border: "1px solid #ededed",
-    backgroundColor: "#FFF",
+    border: "2px solid #1A120B",
+    backgroundColor: "#F3E6C9",
   },
   productImageArea: {
     width: "100%",
-    img: {
-      marginLeft: "-2px",
-    },
     "a:hover": {background: "none"},
   },
   purchasingArea: {
-    width: "calc(100% - 32px)",
-    padding: "16px 8px",
-    margin: "0 auto",
+    width: "100%",
+    padding: "28px 16px 24px",
+    boxSizing: "border-box",
   },
 
   productPrice: {
-    display: "flex",
-    marginBottom: "10px",
-    "> div": {
-      display: "flex",
-      marginLeft: "auto",
-      alignItems: "center",
-      "div + div": {marginLeft: "10px"},
-    },
+    margin: "8px 0 0",
+    fontFamily: '"Spline Sans Mono", ui-monospace, monospace',
+    fontSize: "22px",
+    fontWeight: 600,
+    fontVariantNumeric: "tabular-nums",
   },
   productTotalValues: {
     display: "flex",
-    justifyContent: "flex-end",
-    margin: "10px 0",
+    justifyContent: "space-between",
+    alignItems: "baseline",
+    margin: "16px 0 0",
+    paddingTop: "16px",
+    borderTop: "2px solid #1A120B",
   },
   productStock: {
     fontSize: "14px",
-    display: "flex",
-    alignItems: "center",
-    marginRight: "1px",
-    "> div": {
-      backgroundColor: "#e2e2e2",
-      span: {
-        paddingRight: "12px",
-        marginRight: "1px",
-        backgroundColor: "#ffffff",
-      },
-    },
+    color: "#4A341F",
+    fontFamily: '"Spline Sans Mono", ui-monospace, monospace',
+    fontVariantNumeric: "tabular-nums",
   },
   productCost: {
-    backgroundColor: "#ffffff",
-    paddingLeft: "12px",
-    fontSize: "24px",
-    color: "#6b90dc",
+    fontFamily: '"Spline Sans Mono", ui-monospace, monospace',
+    fontSize: "22px",
+    fontWeight: 600,
+    fontVariantNumeric: "tabular-nums",
+    color: "#1A120B",
   },
   productBtnArea: {
-    marginTop: "10px",
+    marginTop: "16px",
     display: "flex",
-    "button + button": {marginLeft: "5px"},
-    a: {
-      textDecoration: "none",
-      display: "block",
-      width: "100%",
-    },
+    gap: "8px",
   },
   productOrderBtn: {
-    flexGrow: 3,
-    padding: 0,
-    a: {
-      color: "#FFF",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      height: "100%",
-    },
+    flex: 2,
   },
   productCartBtn: {
-    flexGrow: 1,
+    flex: 1,
   },
   package: {
     margin: "10px 0",
@@ -321,23 +307,17 @@ export default {
   //tab Product
   tabProduct: {
     width: "100%",
-    border: "1px solid #dee0e2",
-    // maxHeight: 275,
     overflowY: "auto",
     overflowX: "hidden",
-    // padding: "0px 40px",
     display: "flex",
+    backgroundColor: "#F3E6C9",
     "> div": {
       width: "100%",
       height: "fit-content",
-      // padding: "10px",
     },
   },
   productInfoArea: {
     width: "100%",
-    strong: {
-      fontSize: "20px",
-    },
   },
   stickyFlag: {},
   contentMenubar: {
@@ -345,69 +325,84 @@ export default {
     height: "40px",
     display: "flex",
     justifyContent: "space-around",
-    borderBottom: "1px solid black",
-    margin: "0 auto",
+    border: "2px solid #1A120B",
+    margin: "16px 0 0",
     position: "sticky",
     top: "80px",
     zIndex: 100,
-    backgroundColor: "#fff",
+    backgroundColor: "#F3E6C9",
+    listStyle: "none",
+    padding: 0,
+    boxSizing: "border-box",
     button: {
       width: "100%",
       height: "100%",
       textDecoration: "none",
       padding: "12px 0",
+      color: "#1A120B",
+      fontWeight: 700,
     },
     li: {
       width: "100%",
       textAlign: "center",
-      backgroundColor: "#f3f5f7",
+      backgroundColor: "#F3E6C9",
+      borderRight: "2px solid #1A120B",
+      "&:last-child": {borderRight: 0},
     },
   },
   // productTabContainer
   productTabContainer: {
-    display: "none",
+    display: "flex",
     flexDirection: "column",
     position: "fixed",
     bottom: 0,
     left: 0,
     width: "100%",
-    background: "#fff",
+    background: "#F3E6C9",
     zIndex: 110,
+    borderTop: "2px solid #1A120B",
     "> ul": {width: "100%", borderBottom: 0},
     "> div": {
       display: "flex",
-      borderTop: `1px solid ${primaryColor}`,
+      alignItems: "center",
       justifyContent: "space-between",
       width: "100%",
       margin: "0 auto",
+      padding: "8px 12px",
+      boxSizing: "border-box",
     },
   },
   tabThumbnail: {
     width: 50,
+    height: 50,
+    flexShrink: 0,
     display: "flex",
     alignItems: "center",
-    img: {width: "100%"},
+    overflow: "hidden",
+    backgroundColor: "#2A1A10",
+    img: {width: "100%", height: "100%", objectFit: "cover"},
   },
   tabInfo: {
-    margin: "8px 20px 0",
-    textAlign: "center",
+    margin: "0 12px",
+    flex: 1,
+    minWidth: 0,
     display: "flex",
     flexDirection: "column",
-    div: {fontSize: "18px"},
-    "div:last-child": {fontSize: "14px"},
+    gap: "2px",
+    "div:first-of-type": {fontSize: "15px", fontWeight: 800, lineHeight: 1.3},
+    "div:last-child": {
+      fontFamily: '"Spline Sans Mono", ui-monospace, monospace',
+      fontSize: "14px",
+      fontVariantNumeric: "tabular-nums",
+    },
   },
   tabOpen: {
     display: "flex",
     alignItems: "center",
-    button: {
-      height: "calc(100% + 1px)",
-      borderRadius: 0,
-      borderTop: "0 !important",
-      marginTop: "1px",
-    },
+    flexShrink: 0,
   },
   //product - detail
-  detailPage: {width: "100%", ">div": {paddingTop: "120px"}},
+  detailPage: {width: "100%"},
   //product - qna - qnaEdit
 
   qnaContent: {
@@ -454,17 +449,21 @@ export default {
   },
   categoryTitleBox: {
     display: "flex",
-    marginTop: "50px",
+    marginTop: "16px",
     marginBottom: "13px",
+    padding: "0 12px",
     "> div": {
-      fontSize: "22px",
-      fontWeight: "bold",
+      fontFamily: '"Archivo Narrow", "Noto Sans KR", sans-serif',
+      fontSize: "20px",
+      fontWeight: 700,
+      letterSpacing: "0.06em",
+      color: "#1A120B",
     },
   },
   // CART
   MCartContainer: {
     width: "100%",
-    backgroundColor: "#ebebeb",
+    backgroundColor: "#B48445",
   },
   MCartFormBox: {
     width: "100%",
@@ -473,7 +472,7 @@ export default {
   },
   MCartBox: {
     width: "calc(100% - 40px)",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#F3E6C9",
     padding: "20px",
     textAlign: "center",
   },
@@ -599,7 +598,7 @@ export default {
   },
   // MOrderSheet
   orderSheet: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#F3E6C9",
     padding: "12px",
     h1: {
       width: "100%",
@@ -657,7 +656,7 @@ export default {
   },
   orderSheetDeliveryBox: {
     width: "700px",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#F3E6C9",
     borderRadius: "20px 0 0 20px",
     padding: "30px 40px",
     wordBreak: "break-all",
@@ -699,8 +698,8 @@ export default {
   },
   orderSheetOrderBtn: {
     width: "100%",
-    backgroundColor: "#9ac66d !important",
-    color: "#fff !important",
+    backgroundColor: "#1A120B !important",
+    color: "#F3E6C9 !important",
     textAlign: "center",
     padding: "10px",
     marginTop: "20px",

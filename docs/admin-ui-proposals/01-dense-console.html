@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>A. 밀집 운영대 — E샵 관리자</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+      :root {
+        --ink: #1c2430;
+        --mute: #5b6573;
+        --line: #cfd5dd;
+        --bg: #eef0f3;
+        --paper: #fff;
+        --action: #1a5fb4;
+        --action-ink: #fff;
+        --wait: #9a3412;
+        --danger: #9f1d1d;
+        --ok: #0f6b4c;
+        --nav: 200px;
+        --top: 48px;
+        --bar: 40px;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; }
+      body {
+        font-family: Pretendard, "Noto Sans KR", sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        font-size: 13px;
+        line-height: 1.4;
+      }
+      ::selection { background: #c5d8f0; }
+      :focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
+      .skip {
+        position: absolute; left: 8px; top: -48px; z-index: 80;
+        background: #fff; color: var(--ink); padding: 8px 12px; font-weight: 650;
+      }
+      .skip:focus { top: 8px; }
+      button, input, select { font: inherit; color: inherit; }
+      a { color: inherit; text-decoration: none; }
+      svg { display: block; }
+      .icon { width: 16px; height: 16px; flex: none; }
+
+      .app { display: grid; grid-template-columns: var(--nav) 1fr; grid-template-rows: var(--top) 1fr var(--bar); min-height: 100%; }
+      .top {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 0 12px 0 16px;
+        background: #2b3340;
+        color: #f3f5f7;
+      }
+      .brand { font-weight: 700; font-size: 14px; letter-spacing: -0.02em; }
+      .top-search {
+        width: min(360px, 40vw);
+        height: 30px;
+        border: 0;
+        padding: 0 10px;
+        background: #3d4654;
+        color: #fff;
+      }
+      .top-search::placeholder { color: #b7bec8; }
+      .top-right { margin-left: auto; display: flex; align-items: center; gap: 12px; font-size: 12px; }
+      .top-right button {
+        background: transparent;
+        border: 0;
+        color: inherit;
+        cursor: pointer;
+        padding: 4px 0;
+      }
+
+      .nav {
+        background: #f7f8fa;
+        border-right: 1px solid var(--line);
+        padding: 8px 0 16px;
+      }
+      .nav a {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 32px;
+        padding: 0 14px;
+        color: var(--ink);
+      }
+      .nav a:hover { background: #eceff3; }
+      .nav a[aria-current="page"] {
+        background: #dbe8f6;
+        color: var(--action);
+        font-weight: 650;
+      }
+      .nav .group {
+        margin: 12px 14px 4px;
+        font-size: 11px;
+        color: var(--mute);
+        font-weight: 650;
+      }
+
+      .main { min-width: 0; display: flex; flex-direction: column; background: var(--paper); }
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 44px;
+        padding: 0 12px;
+        border-bottom: 1px solid var(--line);
+        background: #f7f8fa;
+      }
+      .toolbar h1 { margin: 0; font-size: 14px; font-weight: 700; letter-spacing: -0.02em; }
+      .tabs { display: flex; margin-left: 12px; }
+      .tabs button {
+        height: 28px;
+        padding: 0 10px;
+        border: 1px solid var(--line);
+        background: #fff;
+        margin-left: -1px;
+        cursor: pointer;
+      }
+      .tabs button[aria-selected="true"] {
+        background: var(--action);
+        border-color: var(--action);
+        color: #fff;
+        z-index: 1;
+      }
+      .spacer { flex: 1; }
+      .field {
+        height: 28px;
+        border: 1px solid var(--line);
+        padding: 0 8px;
+        background: #fff;
+      }
+      .btn {
+        height: 28px;
+        padding: 0 10px;
+        border: 1px solid var(--line);
+        background: #fff;
+        cursor: pointer;
+      }
+      .btn:disabled { color: #9aa3ae; cursor: not-allowed; }
+      .btn-primary {
+        background: var(--action);
+        border-color: var(--action);
+        color: #fff;
+        font-weight: 650;
+      }
+      .btn-primary:disabled { background: #9bb6d6; border-color: #9bb6d6; color: #eef; }
+      .btn-icon { width: 28px; padding: 0; display: grid; place-items: center; }
+
+      .bulk {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 36px;
+        padding: 0 12px;
+        border-bottom: 1px solid var(--line);
+        font-size: 12px;
+      }
+
+      .table-wrap { overflow: auto; flex: 1; }
+      table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+      th, td { border-bottom: 1px solid var(--line); padding: 6px 10px; text-align: left; white-space: nowrap; }
+      th {
+        position: sticky; top: 0;
+        background: #f3f5f8;
+        font-weight: 650;
+        font-size: 12px;
+        color: var(--mute);
+      }
+      tbody tr:hover { background: #f4f7fb; }
+      tbody tr[aria-selected="true"] { background: #e7f0fa; }
+      td input { vertical-align: middle; }
+      .num { text-align: right; }
+      .st { font-weight: 650; font-size: 12px; }
+      .st-WAIT { color: var(--wait); }
+      .st-PAYMENT { color: var(--action); }
+      .st-COMPLETE { color: var(--ok); }
+      .st-CANCEL, .st-RETURN, .st-CHANGE { color: var(--danger); }
+
+      .empty { padding: 48px 16px; text-align: center; color: var(--mute); }
+      .busy { opacity: 0.55; pointer-events: none; }
+
+      .proposal {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 16px;
+        background: #2b3340;
+        color: #d5dbe3;
+        font-size: 12px;
+      }
+      .proposal a { color: #fff; border-bottom: 1px solid transparent; }
+      .proposal a:hover { border-bottom-color: #fff; }
+      .proposal .on { font-weight: 700; color: #fff; }
+      .proposal .sep { opacity: 0.4; }
+
+      @media (max-width: 900px) {
+        .app { grid-template-columns: 1fr; }
+        .nav { display: none; }
+        .top-search { width: 140px; }
+      }
+    </style>
+  </head>
+  <body>
+    <!--
+      THESIS: 백오피스는 표와 일괄처리다. KPI 카드 대시보드를 거부한다.
+      OWN-WORLD: 쿨 그레이 크롬, 1px 보더, 직각, 운영 블루 #1a5fb4, 32px 행.
+      STORY: 운영자가 대기 주문을 고르고 상태를 바꾼다.
+      FIRST VIEWPORT: 상단 48 + 좌측 200 메뉴 + 툴바/탭/표가 즉시 보인다.
+      FORM: 한국 쇼핑몰 운영 콘솔. FINISH: 견본 — 방향 선택 전.
+    -->
+    <a class="skip" href="#main">본문으로</a>
+    <div class="app">
+      <header class="top">
+        <div class="brand">E샵 관리자</div>
+        <input class="top-search" type="search" placeholder="주문번호·상품·주문자" aria-label="전체 검색" />
+        <div class="top-right">
+          <span>관리자</span>
+          <button type="button">로그아웃</button>
+        </div>
+      </header>
+      <nav class="nav" aria-label="관리 메뉴">
+        <div class="group">운영</div>
+        <a href="#">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>
+          대시보드
+        </a>
+        <a href="#" aria-current="page">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square"><path d="M7 7h13M7 12h13M7 17h13M4 7h.01M4 12h.01M4 17h.01"/></svg>
+          주문
+        </a>
+        <a href="#">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square"><path d="M3 8l9-4 9 4v11H3zM3 8h18"/></svg>
+          배송
+        </a>
+        <a href="#">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square"><path d="M4 12h16M12 4v16"/></svg>
+          클레임
+        </a>
+        <div class="group">상품</div>
+        <a href="#">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square"><path d="M4 8h16v12H4zM8 8V6h8v2"/></svg>
+          상품
+        </a>
+        <a href="#">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square"><path d="M4 20V8l8-4 8 4v12H4z"/></svg>
+          카테고리
+        </a>
+        <div class="group">설정</div>
+        <a href="#">정책</a>
+        <a href="#">권한</a>
+        <a href="#">메뉴</a>
+      </nav>
+      <main class="main" id="main">
+        <div class="toolbar">
+          <h1>주문</h1>
+          <div class="tabs" role="tablist" aria-label="주문 상태">
+            <button type="button" role="tab" aria-selected="true" data-tab="wait">대기 4</button>
+            <button type="button" role="tab" aria-selected="false" data-tab="done">완료/클레임 2</button>
+          </div>
+          <div class="spacer"></div>
+          <input id="filter" class="field" type="search" placeholder="이 목록에서 찾기" aria-label="목록 필터" />
+          <button class="btn btn-icon" type="button" id="refresh" aria-label="새로고침">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v6h-6"/></svg>
+          </button>
+        </div>
+        <div class="bulk">
+          <label>상태
+            <select id="next-status" class="field" aria-label="변경할 상태">
+              <option value="PAYMENT">결제완료</option>
+              <option value="COMPLETE">완료</option>
+              <option value="CANCEL">취소</option>
+              <option value="RETURN">반품</option>
+              <option value="CHANGE">교환</option>
+            </select>
+          </label>
+          <button class="btn btn-primary" type="button" id="apply" disabled>상태 변경</button>
+          <span id="picked">선택 0건</span>
+          <span class="spacer"></span>
+          <span id="stamp">갱신 16:19</span>
+        </div>
+        <div class="table-wrap" id="grid">
+          <table>
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="all" aria-label="현재 목록 모두 선택" /></th>
+                <th>주문번호</th>
+                <th>시각</th>
+                <th>상품</th>
+                <th>옵션</th>
+                <th class="num">금액</th>
+                <th>상태</th>
+                <th>주문자</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+          <div class="empty" id="empty" hidden>검색에 맞는 주문이 없습니다. 필터를 지우고 다시 보세요.</div>
+        </div>
+      </main>
+      <div class="proposal">
+        <span class="on">A 밀집 운영대</span>
+        <span class="sep">|</span>
+        <a href="index.html">비교</a>
+        <a href="02-queue-workbench.html">B</a>
+        <a href="03-ledger-grid.html">C</a>
+        <a href="04-inspector-split.html">D</a>
+      </div>
+    </div>
+    <script>
+      const DATA = [
+        { id: "20250814-1001", tab: "wait", time: "14:02", product: "오리지널 블렌드 원두 200g", option: "분쇄도 · 홀빈", price: "18,000", status: "WAIT", buyer: "김민준" },
+        { id: "20250814-1002", tab: "wait", time: "13:41", product: "디카페인 콜드브루 1L", option: "세트 · 단품", price: "12,000", status: "WAIT", buyer: "이서연" },
+        { id: "20250814-1003", tab: "wait", time: "13:18", product: "핸드드립 드리퍼 세트", option: "색상 · 블랙", price: "29,000", status: "PAYMENT", buyer: "박도윤" },
+        { id: "20250814-1004", tab: "wait", time: "12:55", product: "시그니처 머그 350ml", option: "옵션 없음", price: "15,000", status: "WAIT", buyer: "최하은" },
+        { id: "20250814-1005", tab: "done", time: "11:20", product: "오리지널 블렌드 원두 200g", option: "분쇄도 · 드립", price: "18,000", status: "CANCEL", buyer: "정우진" },
+        { id: "20250814-0998", tab: "done", time: "어제", product: "디카페인 콜드브루 1L", option: "세트 · 2병세트", price: "15,000", status: "COMPLETE", buyer: "한소희" },
+      ];
+      const STATUS = { WAIT: "대기", PAYMENT: "결제완료", COMPLETE: "완료", CANCEL: "취소", RETURN: "반품", CHANGE: "교환" };
+      let tab = "wait";
+      let selected = new Set();
+
+      const rowsEl = document.getElementById("rows");
+      const emptyEl = document.getElementById("empty");
+      const apply = document.getElementById("apply");
+      const picked = document.getElementById("picked");
+      const all = document.getElementById("all");
+      const filter = document.getElementById("filter");
+      const grid = document.getElementById("grid");
+
+      function visible() {
+        const q = filter.value.trim();
+        return DATA.filter((r) => r.tab === tab && (!q || `${r.id}${r.product}${r.buyer}`.includes(q)));
+      }
+      function render() {
+        const list = visible();
+        rowsEl.innerHTML = list.map((r) => `
+          <tr data-id="${r.id}" aria-selected="${selected.has(r.id)}">
+            <td><input type="checkbox" ${selected.has(r.id) ? "checked" : ""} aria-label="${r.id} 선택" /></td>
+            <td>${r.id}</td>
+            <td>${r.time}</td>
+            <td>${r.product}</td>
+            <td>${r.option}</td>
+            <td class="num">${r.price}</td>
+            <td><span class="st st-${r.status}">${STATUS[r.status]}</span></td>
+            <td>${r.buyer}</td>
+          </tr>
+        `).join("");
+        emptyEl.hidden = list.length > 0;
+        document.querySelector("table").hidden = list.length === 0;
+        picked.textContent = `선택 ${selected.size}건`;
+        apply.disabled = selected.size === 0;
+        all.checked = list.length > 0 && list.every((r) => selected.has(r.id));
+      }
+
+      document.querySelectorAll("[data-tab]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          tab = btn.dataset.tab;
+          selected.clear();
+          document.querySelectorAll("[data-tab]").forEach((b) => b.setAttribute("aria-selected", String(b === btn)));
+          render();
+        });
+      });
+      rowsEl.addEventListener("change", (e) => {
+        const tr = e.target.closest("tr");
+        if (!tr) return;
+        if (e.target.checked) selected.add(tr.dataset.id); else selected.delete(tr.dataset.id);
+        render();
+      });
+      all.addEventListener("change", () => {
+        visible().forEach((r) => eChecked(r.id, all.checked));
+        render();
+      });
+      function eChecked(id, on) { if (on) selected.add(id); else selected.delete(id); }
+      filter.addEventListener("input", render);
+      apply.addEventListener("click", () => {
+        const next = document.getElementById("next-status").value;
+        DATA.forEach((r) => { if (selected.has(r.id)) r.status = next; });
+        selected.clear();
+        render();
+      });
+      document.getElementById("refresh").addEventListener("click", () => {
+        grid.classList.add("busy");
+        setTimeout(() => {
+          grid.classList.remove("busy");
+          document.getElementById("stamp").textContent = "갱신 " + new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+        }, 400);
+      });
+      render();
+    </script>
+  </body>
+</html>

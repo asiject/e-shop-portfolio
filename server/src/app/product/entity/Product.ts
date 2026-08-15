@@ -4,6 +4,7 @@ import OrderProduct from "@order/entity/OrderProduct";
 import {Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, OneToOne, CreateDateColumn} from "typeorm";
 import ProductImage from "./ProductImage";
 import ProductOption from "./ProductOption";
+import ProductQna from "./ProductQna";
 @Entity()
 export default class Product extends BaseEntity {
   @PrimaryGeneratedColumn({type: "bigint"})
@@ -44,6 +45,9 @@ export default class Product extends BaseEntity {
 
   @OneToMany(() => ProductImage, image => image.product)
   images: ProductImage[];
+
+  @OneToMany(() => ProductQna, qna => qna.product)
+  qnas: ProductQna[];
 
   @OneToOne(() => Cart)
   cart: Cart;

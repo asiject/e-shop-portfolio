@@ -3,18 +3,21 @@ import NoData from "@web/common/NoData";
 import {useIntl} from "react-intl";
 import MenuIcon from "@mui/icons-material/Menu";
 import {arrayMove, SortableContainer, SortableContainerProps, SortableElement, SortableElementProps, SortableHandle} from "react-sortable-hoc";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {putMenuSortno} from "@recoils/admin/menu/axios";
+
+const DragIcon = SortableHandle(() => (
+  <ListItemIcon>
+    <IconButton>
+      <MenuIcon />
+    </IconButton>
+  </ListItemIcon>
+));
 
 //draggable
 export default function CheckedList({list, selected, setSelected}: any) {
-  const [items, setItems] = useState([]);
-
-  useEffect(() => {
-    if (items?.length == 0 && list?.length != 0) {
-      setItems(list);
-    }
-  }, [list]);
+  // 한글 주석: list 동기화는 부모 key 리마운트에 위임
+  const [items, setItems] = useState(list ?? []);
 
   const onSortEnd = async ({oldIndex, newIndex}: {oldIndex: number; newIndex: number}) => {
     const sorted = arrayMove(items, oldIndex, newIndex);
@@ -59,13 +62,6 @@ const SortableItem: React.ComponentClass<SortableElementProps & {value: any; sel
   ({value, selected, setSelected}: {value: any; selected: any; setSelected: any}) => {
     const {formatMessage} = useIntl();
 
-    const DragIcon = SortableHandle(() => (
-      <ListItemIcon>
-        <IconButton>
-          <MenuIcon />
-        </IconButton>
-      </ListItemIcon>
-    ));
     const handelChecked = (e: any) => {
       const idx = selected?.findIndex((item: any) => item?.id == value?.id);
       if (idx > -1) {

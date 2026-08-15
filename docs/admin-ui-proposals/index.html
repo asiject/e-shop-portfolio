@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>E샵 관리자 UI 견본</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+      :root {
+        --ink: #16181d;
+        --mute: #4d5560;
+        --line: #d8dce3;
+        --bg: #f3f4f6;
+        --paper: #fff;
+        --space-1: 4px;
+        --space-2: 8px;
+        --space-3: 12px;
+        --space-4: 16px;
+        --space-5: 24px;
+        --space-6: 40px;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; min-height: 100%; }
+      body {
+        font-family: Pretendard, "Noto Sans KR", sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        line-height: 1.45;
+      }
+      ::selection { background: #dbe4f0; }
+      :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+      a { color: inherit; }
+      .wrap { max-width: 1200px; margin: 0 auto; padding: var(--space-6) var(--space-5) 72px; }
+      header { margin-bottom: var(--space-6); }
+      h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        margin: 0 0 var(--space-2);
+      }
+      .lede {
+        margin: 0;
+        color: var(--mute);
+        max-width: 62ch;
+        font-size: 0.95rem;
+      }
+      .note {
+        margin: var(--space-4) 0 0;
+        font-size: 0.8125rem;
+        color: var(--mute);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-5);
+      }
+      @media (max-width: 960px) {
+        .grid { grid-template-columns: 1fr; }
+        .b-sample, .d-sample { grid-template-columns: 1fr; }
+        .b-q { display: flex; gap: 4px; overflow: auto; }
+        .b-q .on, .b-q .row { white-space: nowrap; }
+        td { white-space: normal; }
+      }
+      article {
+        min-width: 0;
+        background: var(--paper);
+        border: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+      }
+      .meta { padding: var(--space-4) var(--space-4) var(--space-3); }
+      .meta h2 {
+        margin: 0 0 var(--space-1);
+        font-size: 1.05rem;
+        letter-spacing: -0.02em;
+      }
+      .meta p {
+        margin: 0;
+        font-size: 0.8125rem;
+        color: var(--mute);
+      }
+      .fit {
+        font-size: 0.75rem;
+        color: var(--ink);
+        margin-top: var(--space-2);
+      }
+      .sample {
+        min-width: 0;
+        border-top: 1px solid var(--line);
+        background: #eef0f3;
+      }
+      .actions {
+        display: flex;
+        gap: var(--space-2);
+        padding: var(--space-3) var(--space-4) var(--space-4);
+        border-top: 1px solid var(--line);
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 34px;
+        padding: 0 var(--space-3);
+        font: inherit;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        text-decoration: none;
+        border: 1px solid var(--ink);
+        background: var(--ink);
+        color: #fff;
+      }
+      .btn.ghost { background: #fff; color: var(--ink); }
+
+      table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+      th, td { text-align: left; white-space: nowrap; }
+      .num { text-align: right; }
+      .st-WAIT { color: #9a3412; font-weight: 650; }
+      .st-PAY { color: #1a5fb4; font-weight: 650; }
+      .st-OK { color: #0f6b4c; font-weight: 650; }
+      .st-CX { color: #9f1d1d; font-weight: 650; }
+
+      /* A */
+      .a-sample { background: #fff; overflow: auto; }
+      .a-bar {
+        display: flex; align-items: center; gap: 8px;
+        height: 36px; padding: 0 10px;
+        background: #f7f8fa; border-bottom: 1px solid #cfd5dd;
+        font-size: 12px;
+      }
+      .a-bar strong { font-size: 13px; }
+      .a-chip { padding: 2px 8px; background: #1a5fb4; color: #fff; }
+      .a-chip-off { padding: 2px 8px; border: 1px solid #cfd5dd; background: #fff; }
+      .a-sample th, .a-sample td {
+        border-bottom: 1px solid #cfd5dd;
+        padding: 7px 10px;
+        font-size: 12px;
+      }
+      .a-sample th { background: #f3f5f8; color: #5b6573; font-weight: 650; }
+
+      /* B */
+      .b-sample { display: grid; grid-template-columns: 132px 1fr; min-height: 220px; }
+      .b-q { background: #1c1917; color: #e7e5e4; padding: 10px 8px; font-size: 12px; }
+      .b-q .on { display: flex; justify-content: space-between; padding: 8px; background: #44403c; }
+      .b-q button, .b-q .row { display: flex; justify-content: space-between; padding: 8px; color: #a8a29e; }
+      .b-q .hot { color: #fdba74; font-weight: 700; }
+      .b-list { padding: 10px; display: flex; flex-direction: column; gap: 8px; background: #f4f1ec; }
+      .ticket {
+        background: #fffcf8; border: 1px solid #e7e0d6; padding: 8px 10px; font-size: 12px;
+      }
+      .ticket .id { font-weight: 700; }
+      .ticket .meta { color: #57534e; margin-top: 2px; }
+
+      /* C */
+      .c-sample { background: #fff; overflow: auto; }
+      .c-bar {
+        display: flex; align-items: center; gap: 8px;
+        height: 32px; padding: 0 8px;
+        border-bottom: 1px solid #e4e4e7;
+        font-size: 12px; font-weight: 700;
+      }
+      .c-sample th, .c-sample td {
+        border-right: 1px solid #e4e4e7;
+        border-bottom: 1px solid #e4e4e7;
+        padding: 5px 8px;
+        font-size: 12px;
+      }
+      .c-sample th { background: #f4f4f5; font-weight: 650; }
+      .c-sample tr:nth-child(even) td { background: #fafafa; }
+
+      /* D */
+      .d-sample { display: grid; grid-template-columns: 1fr 1fr; min-height: 220px; background: #f3f4f6; }
+      .d-list { background: #fff; border-right: 1px solid #e5e7eb; }
+      .d-item { padding: 8px 12px; border-bottom: 1px solid #e5e7eb; font-size: 12px; }
+      .d-item.on { background: #e8eef5; }
+      .d-item .id { font-weight: 700; display: flex; justify-content: space-between; }
+      .d-item .meta { color: #4b5563; margin-top: 2px; }
+      .d-pane { padding: 12px; }
+      .d-card { background: #fff; border: 1px solid #e5e7eb; padding: 12px; font-size: 12px; }
+      .d-card h3 { margin: 0 0 8px; font-size: 14px; }
+      .d-card dl { margin: 0; }
+      .d-card div { display: grid; grid-template-columns: 52px 1fr; gap: 6px; padding: 6px 0; border-top: 1px solid #e5e7eb; }
+      .d-card dt { color: #4b5563; }
+      .d-card dd { margin: 0; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>E샵 관리자 UI 견본</h1>
+        <p class="lede">
+          스토어프론트(크라프트)와 분리한 백오피스 전용 방향 4종입니다.
+          아래 리스트는 같은 주문 4건을 각 문법으로 다시 그린 것입니다.
+        </p>
+        <p class="note">하나를 고르면 그 크롬으로 상품·카테고리·클레임까지 맞춥니다. 전체 화면에서 검색·선택·상태 변경을 시험할 수 있습니다.</p>
+      </header>
+      <div class="grid">
+        <article>
+          <div class="meta">
+            <h2>A. 밀집 운영대</h2>
+            <p>툴바·일괄처리·고밀도 표. 카드 대시보드를 쓰지 않습니다.</p>
+            <p class="fit">맞음: 하루 종일 주문/상품을 처리하는 운영자</p>
+          </div>
+          <div class="sample a-sample">
+            <div class="a-bar">
+              <strong>주문</strong>
+              <span class="a-chip">대기 3</span>
+              <span class="a-chip-off">완료/클레임 1</span>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>주문번호</th>
+                  <th>상품</th>
+                  <th>옵션</th>
+                  <th class="num">금액</th>
+                  <th>상태</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><input type="checkbox" tabindex="-1" aria-hidden="true" /></td>
+                  <td>20250814-1001</td>
+                  <td>오리지널 블렌드 원두 200g</td>
+                  <td>분쇄도 · 홀빈</td>
+                  <td class="num">18,000</td>
+                  <td><span class="st-WAIT">대기</span></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" tabindex="-1" aria-hidden="true" /></td>
+                  <td>20250814-1002</td>
+                  <td>디카페인 콜드브루 1L</td>
+                  <td>세트 · 단품</td>
+                  <td class="num">12,000</td>
+                  <td><span class="st-WAIT">대기</span></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" tabindex="-1" aria-hidden="true" /></td>
+                  <td>20250814-1003</td>
+                  <td>핸드드립 드리퍼 세트</td>
+                  <td>색상 · 블랙</td>
+                  <td class="num">29,000</td>
+                  <td><span class="st-PAY">결제완료</span></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" tabindex="-1" aria-hidden="true" /></td>
+                  <td>20250814-1004</td>
+                  <td>시그니처 머그 350ml</td>
+                  <td>옵션 없음</td>
+                  <td class="num">15,000</td>
+                  <td><span class="st-WAIT">대기</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="actions">
+            <a class="btn" href="01-dense-console.html">전체 화면</a>
+            <a class="btn ghost" href="01-dense-console.html" target="_blank" rel="noopener">새 탭</a>
+          </div>
+        </article>
+
+        <article>
+          <div class="meta">
+            <h2>B. 큐 작업대</h2>
+            <p>좌측이 메뉴가 아니라 대기열입니다. 처리할 줄이 첫 화면입니다.</p>
+            <p class="fit">맞음: 포장·클레임을 큐 단위로 비우는 작업</p>
+          </div>
+          <div class="sample b-sample">
+            <div class="b-q">
+              <div class="on">신규 주문 <span class="hot">3</span></div>
+              <div class="row">배송 준비 <span>1</span></div>
+              <div class="row">취소 요청 <span class="hot">1</span></div>
+              <div class="row">완료 <span>1</span></div>
+            </div>
+            <div class="b-list">
+              <div class="ticket">
+                <div class="id">20250814-1001</div>
+                <div class="meta">14:02 · 김민준 · 오리지널 블렌드 원두 200g · 홀빈</div>
+              </div>
+              <div class="ticket">
+                <div class="id">20250814-1002</div>
+                <div class="meta">13:41 · 이서연 · 디카페인 콜드브루 1L · 단품</div>
+              </div>
+              <div class="ticket">
+                <div class="id">20250814-1004</div>
+                <div class="meta">12:55 · 최하은 · 시그니처 머그 350ml</div>
+              </div>
+            </div>
+          </div>
+          <div class="actions">
+            <a class="btn" href="02-queue-workbench.html">전체 화면</a>
+            <a class="btn ghost" href="02-queue-workbench.html" target="_blank" rel="noopener">새 탭</a>
+          </div>
+        </article>
+
+        <article>
+          <div class="meta">
+            <h2>C. 장부 그리드</h2>
+            <p>크롬을 거의 없앤 스프레드시트. 데이터가 지면입니다.</p>
+            <p class="fit">맞음: 행을 많이 보고 상태만 바꾸는 정산·재고형 운영</p>
+          </div>
+          <div class="sample c-sample">
+            <div class="c-bar">주문 · 전체 4행</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>A 주문번호</th>
+                  <th>B 시각</th>
+                  <th>C 상품</th>
+                  <th>D 옵션</th>
+                  <th>E 금액</th>
+                  <th>F 상태</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>20250814-1001</td>
+                  <td>14:02</td>
+                  <td>오리지널 블렌드 원두 200g</td>
+                  <td>분쇄도 · 홀빈</td>
+                  <td class="num">18,000</td>
+                  <td>대기</td>
+                </tr>
+                <tr>
+                  <td>20250814-1002</td>
+                  <td>13:41</td>
+                  <td>디카페인 콜드브루 1L</td>
+                  <td>세트 · 단품</td>
+                  <td class="num">12,000</td>
+                  <td>대기</td>
+                </tr>
+                <tr>
+                  <td>20250814-1003</td>
+                  <td>13:18</td>
+                  <td>핸드드립 드리퍼 세트</td>
+                  <td>색상 · 블랙</td>
+                  <td class="num">29,000</td>
+                  <td>결제완료</td>
+                </tr>
+                <tr>
+                  <td>20250814-1004</td>
+                  <td>12:55</td>
+                  <td>시그니처 머그 350ml</td>
+                  <td>—</td>
+                  <td class="num">15,000</td>
+                  <td>대기</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="actions">
+            <a class="btn" href="03-ledger-grid.html">전체 화면</a>
+            <a class="btn ghost" href="03-ledger-grid.html" target="_blank" rel="noopener">새 탭</a>
+          </div>
+        </article>
+
+        <article>
+          <div class="meta">
+            <h2>D. 검수 스플릿</h2>
+            <p>목록에서 고르면 오른쪽에서 옵션·배송·상태를 검수합니다.</p>
+            <p class="fit">맞음: 분쇄도·세트 옵션을 주문 단위로 확인하는 검수</p>
+          </div>
+          <div class="sample d-sample">
+            <div class="d-list">
+              <div class="d-item on">
+                <div class="id">20250814-1001 <span class="st-WAIT">대기</span></div>
+                <div class="meta">김민준 · 원두 200g</div>
+              </div>
+              <div class="d-item">
+                <div class="id">20250814-1002 <span class="st-WAIT">대기</span></div>
+                <div class="meta">이서연 · 콜드브루 1L</div>
+              </div>
+              <div class="d-item">
+                <div class="id">20250814-1003 <span class="st-PAY">결제완료</span></div>
+                <div class="meta">박도윤 · 드리퍼 세트</div>
+              </div>
+              <div class="d-item">
+                <div class="id">20250814-1004 <span class="st-WAIT">대기</span></div>
+                <div class="meta">최하은 · 머그 350ml</div>
+              </div>
+            </div>
+            <div class="d-pane">
+              <div class="d-card">
+                <h3>20250814-1001</h3>
+                <dl>
+                  <div><dt>주문자</dt><dd>김민준</dd></div>
+                  <div><dt>상품</dt><dd>오리지널 블렌드 원두 200g<br />분쇄도 · 홀빈 × 1</dd></div>
+                  <div><dt>상태</dt><dd>대기</dd></div>
+                </dl>
+              </div>
+            </div>
+          </div>
+          <div class="actions">
+            <a class="btn" href="04-inspector-split.html">전체 화면</a>
+            <a class="btn ghost" href="04-inspector-split.html" target="_blank" rel="noopener">새 탭</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </body>
+</html>

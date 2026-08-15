@@ -8,7 +8,7 @@ import axios from "axios";
 import {Box, Button, FormControlLabel, Radio, RadioGroup, Table, TableBody, TableCell, TableRow, TextField, Checkbox} from "@mui/material";
 
 import {userState} from "@recoils/user/state";
-import {getOrderSheetQuery, getRecentDestinationQuery} from "@recoils/order/query";
+import {useOrderSheetQuery, useRecentDestinationQuery} from "@recoils/order/query";
 import {execute} from "@utils/Executor";
 import {numberFormat} from "@utils/Numaric";
 import PostCode from "@thirdparty/postcode/PostCode";
@@ -17,6 +17,7 @@ import {Product, User, FormValues, DeleveryData} from "@utils/Types";
 import Loading from "@layout/Loading";
 import Error from "@layout/Error";
 import {MStyles} from "@styles";
+import MOrderSheetProducts from "./MOrderSheetProducts";
 
 export default function MOrderSheetList() {
   const {id} = useParams();
@@ -44,9 +45,9 @@ export default function MOrderSheetList() {
   const [copyReceiver, setCopyReceiver] = useState<User>();
   const NUMBERIC_DASH_REGEX = /^[0-9-]+$/;
 
-  const {isLoading, isError, data, error} = getOrderSheetQuery({userid: loginUser?.userid, orderid: id || ""});
+  const {isLoading, isError, data, error} = useOrderSheetQuery({userid: loginUser?.userid, orderid: id || ""});
 
-  const result = getRecentDestinationQuery(loginUser?.userid);
+  const result = useRecentDestinationQuery(loginUser?.userid);
   const {
     register,
     handleSubmit,
@@ -63,7 +64,7 @@ export default function MOrderSheetList() {
     } else {
       navigate("/login");
     }
-  }, [data]);
+  }, [data, loginUser, navigate]);
 
   useEffect(() => {
     if (loginUser) {
@@ -83,8 +84,6 @@ export default function MOrderSheetList() {
     const {products} = result;
     setOrderSheet(
       products.map((product: Product) => {
-        //FIXME: product type 설정
-        console.log("product : ", product);
         return {
           productid: product.productid,
           title: product.title,
@@ -118,7 +117,6 @@ export default function MOrderSheetList() {
   };
 
   const handleOrdered = async (formData: any) => {
-    console.log("formData >> ", formData);
     await execute(async () => {
       const info = {
         status: formData.type == "pay" ? "PAYMENT" : "WAIT",
@@ -134,12 +132,10 @@ export default function MOrderSheetList() {
       const params = Object.assign(info, formData);
       // console.log("params & formData >>>", params);
       if (params.postcode == "") {
-        console.log("zonecode is empty");
         return;
       }
       // orders payment, delivery, buyer 정보 받아서 저장
-      const orderData = await axios.put(`/api/v1/user/${loginUser.userid}/order/${id}/status`, params);
-      console.log("order data : ", orderData.data);
+      await axios.put(`/api/v1/user/${loginUser.userid}/order/${id}/checkout`, params);
       if (params.addAddress === true) {
         // user_address DB에 유저 배송지 저장
         // { alias : addressNickname, postcode, address1, address2, phone, userid}
@@ -152,10 +148,9 @@ export default function MOrderSheetList() {
           phone: params.receiverPhone, // 받는 사람 연락처
         };
         // console.log("address >> ", address);
-        const addressData = await axios.post(`/api/v1/user/${loginUser.userid}/address`, address);
-        console.log("address Data : ", addressData.data);
+        await axios.post(`/api/v1/user/${loginUser.userid}/address`, address);
       }
-      // user_payment 에 페이공제 정보[장부명, 장부 번호] 저장
+      // user_payment 에 페이공제 정보 저장
       // { alias : payname, sabun: paynumber, userid}
       const payment = {
         userid: loginUser.userid,
@@ -163,8 +158,7 @@ export default function MOrderSheetList() {
         sabun: params.paynumber,
       };
       // console.log("payment >> ", payment);
-      const paymentData = await axios.post(`/api/v1/user/${loginUser.userid}/payment`, payment);
-      console.log("paymentData >> ", paymentData);
+      await axios.post(`/api/v1/user/${loginUser.userid}/payment`, payment);
       // 결과창으로 이동
       navigate(`/order/sheet/${id}/result`);
     });
@@ -197,21 +191,7 @@ export default function MOrderSheetList() {
   return (
     <Box component={"form"} onSubmit={handleSubmit(handleOrdered)}>
       <Box sx={MStyles.container}>
-        <Box sx={MStyles.orderSheet}>
-          <Box component={"h1"}>주문/결제</Box>
-          <Box component={"ul"}>
-            {orderSheet &&
-              orderSheet.map((order, i) => {
-                return <OrderedList key={i} order={order} />;
-              })}
-            <Box sx={MStyles.orderProductsCost}>
-              <Box>
-                <Box>총 합계 금액</Box>
-                <Box sx={MStyles.font20}>{numberFormat(totalCost)}</Box>
-              </Box>
-            </Box>
-          </Box>
-        </Box>
+        <MOrderSheetProducts orderSheet={orderSheet} totalCost={totalCost} />
         <Box>
           <Table sx={MStyles.deliveryBox}>
             <TableBody>
@@ -500,10 +480,10 @@ export default function MOrderSheetList() {
                           <Box className="header">페이공제</Box>
                           <Box sx={{input: {border: "0 !important"}}}>
                             <Box>
-                              간사 이름(장부 이름) <TextField {...register("payname")} />
+                              이름 <TextField {...register("payname")} />
                             </Box>
                             <Box>
-                              간사 번호(장부 번호) <TextField {...register("paynumber")} />
+                              번호 <TextField {...register("paynumber")} />
                             </Box>
                           </Box>
                         </Box>
@@ -542,29 +522,6 @@ export default function MOrderSheetList() {
       </Box>
       <RecentDelivery open={dOpen} setOpen={setDOpen} deliveryList={deliveryList} setDeliveryFromList={setDeliveryFromList} />
       <PostCode open={open} setOpen={setOpen} handleData={handleData} />
-    </Box>
-  );
-}
-
-function OrderedList({order}: any) {
-  const option = order.option.replaceAll(":", ": ").split("/");
-  return (
-    <Box component={"li"} sx={MStyles.w100per}>
-      <Box sx={MStyles.orderLeft}>
-        <Box component={"img"} src={order.thumbnail} />
-      </Box>
-      <Box sx={MStyles.orderRight}>
-        <Box component={"h2"}>{order.title}</Box>
-        <Box component={"ul"}>
-          <Box component={"li"}>상품가 : {numberFormat(order.cost * order.count)}</Box>
-          <Box component={"li"}>수량 : {order.count}개</Box>
-          <Box component={"ul"}>
-            <Box component={"li"}>
-              옵션 : {option[0]}, {option[1]}
-            </Box>
-          </Box>
-        </Box>
-      </Box>
     </Box>
   );
 }

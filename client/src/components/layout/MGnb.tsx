@@ -1,4 +1,3 @@
-import {useEffect, useState} from "react";
 import {useNavigate, Outlet, Link, NavLink} from "react-router-dom";
 import {useRecoilState} from "recoil";
 import {isMobile} from "react-device-detect";
@@ -10,29 +9,25 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import MenuIcon from "@mui/icons-material/Menu";
 import LogoutIcon from "@mui/icons-material/Logout";
 
-import {getCategoryListQuery} from "@recoils/category/query";
-import {userState} from "@recoils/user/state";
+import {useCategoryListQuery} from "@recoils/category/query";
+import {isLoggedIn, userState} from "@recoils/user/state";
 import Loading from "./Loading";
 import Error from "./Error";
-import {MStyles} from "@styles";
+import {postLogout} from "@recoils/login/axios";
+import {kraft} from "theme/kraft";
+import Logo from "components/shop/Logo";
 
 export default function MGnb() {
-  const {isLoading, isError, data, error} = getCategoryListQuery();
-  const [list, setList] = useState([]);
+  const {isLoading, isError, data, error} = useCategoryListQuery();
+  const list = (data ?? []).map((c: any) => ({
+    id: c.id,
+    title: c.title,
+    type: c.type,
+    action: "/m/category/" + c.id,
+  }));
   const [user, setUser] = useRecoilState(userState);
+  const loggedIn = isLoggedIn(user);
   const navigate = useNavigate();
-  useEffect(() => {
-    if (data) {
-      setList(
-        data?.map((c: any) => ({
-          id: c.id,
-          title: c.title,
-          type: c.type,
-          action: "/m/category/" + c.id,
-        })),
-      );
-    }
-  }, [data]);
 
   if (isLoading) {
     return <Loading />;
@@ -41,103 +36,101 @@ export default function MGnb() {
     return <Error error={error} />;
   }
 
-  const onLogout = () => {
-    alert("로그아웃 되었습니다");
+  const onLogout = async () => {
+    await postLogout();
     setUser(null);
+    alert("로그아웃 되었습니다");
     isMobile ? navigate("/m") : navigate("/");
   };
 
   return (
     <>
-      <Box sx={MStyles.mgnb}>
-        <Box sx={MStyles.header}>
-          <Box sx={MStyles.headerLeftBox}>
-            <Box sx={MStyles.icon}>
-              <MenuIcon />
-            </Box>
-            <Box sx={MStyles.icon}>
-              <SearchIcon />
-            </Box>
+      <Box
+        component="header"
+        sx={{
+          width: "100%",
+          position: "sticky",
+          top: 0,
+          zIndex: 1000,
+          backgroundColor: kraft.paper,
+          fontFamily: kraft.sans,
+          a: {color: kraft.ink, textDecoration: "none"},
+        }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "8px 12px",
+            gap: 1,
+          }}>
+          <Box sx={{display: "flex", color: kraft.ink}}>
+            <MenuIcon sx={{fontSize: 26, mr: 0.5}} />
+            <SearchIcon sx={{fontSize: 26}} />
           </Box>
-          <Box sx={MStyles.logo}>
-            <Link to="/m/">
-              <Box component={"img"} src="/public/img/logo.jpg" />
-            </Link>
+          <Logo to="/m/" size="sm" />
+          <Box sx={{display: "flex", alignItems: "center", gap: 0.5, color: kraft.ink}}>
+            {loggedIn ? (
+              <>
+                <Box component={Link} to="/m/order/list" aria-label="주문 목록" sx={{display: "flex"}}>
+                  <PersonIcon sx={{fontSize: 26}} />
+                </Box>
+                <Box component={Link} to="/m/cart/list" aria-label="장바구니" sx={{display: "flex"}}>
+                  <ShoppingCartIcon sx={{fontSize: 26}} />
+                </Box>
+                <Box
+                  component="button"
+                  type="button"
+                  onClick={onLogout}
+                  aria-label="로그아웃"
+                  sx={{display: "flex", background: "none", border: 0, padding: 0, cursor: "pointer", color: kraft.ink}}>
+                  <LogoutIcon sx={{fontSize: 26}} />
+                </Box>
+              </>
+            ) : (
+              <Box
+                component={NavLink}
+                to="/login"
+                sx={{
+                  backgroundColor: kraft.sticker,
+                  border: `1px solid ${kraft.ink}`,
+                  padding: "4px 8px",
+                  fontWeight: 700,
+                  fontSize: 13,
+                }}>
+                로그인
+              </Box>
+            )}
           </Box>
-          {user ? (
-            <Box sx={MStyles.headerRightBox}>
-              <Box sx={MStyles.iconbox}>
-                <Box>
-                  <Link to="/m/order/list">
-                    <Box sx={MStyles.icon}>
-                      <PersonIcon />
-                    </Box>
-                    {/* 마이정보 */}
-                  </Link>
-                </Box>
-              </Box>
-              <Box sx={MStyles.iconbox}>
-                <Box>
-                  <Link to="/m/cart/list">
-                    <Box sx={MStyles.icon}>
-                      <ShoppingCartIcon />
-                    </Box>
-                    {/* 장바구니 */}
-                  </Link>
-                </Box>
-              </Box>
-              <Box sx={MStyles.iconbox}>
-                <Box>
-                  <Box>
-                    <Box sx={MStyles.icon} onClick={onLogout}>
-                      <LogoutIcon />
-                    </Box>
-                    {/* 로그아웃 버튼 */}
-                  </Box>
-                </Box>
-              </Box>
-            </Box>
-          ) : (
-            // <Box sx={MStyles.iconbox}>
-            //   <Box>
-            //     <Link to="/m/login">
-            //       <Box sx={MStyles.icon}>
-            //         <GoogleIcon />
-            //       </Box>
-            //     </Link>
-            //   </Box>
-            // </Box>
-
-            <Box sx={MStyles.headerRightBox}>
-              <Box sx={MStyles.iconbox}>
-                {user ? (
-                  <Box>
-                    <Box sx={MStyles.icon}>
-                      <PersonIcon />
-                    </Box>
-                  </Box>
-                ) : (
-                  <NavLink to="/login">로그인</NavLink>
-                )}
-              </Box>
-            </Box>
-          )}
         </Box>
-        <Box sx={MStyles.menubar}>
-          <Box component={"ul"} sx={MStyles.menulist}>
-            {list.length > 0 &&
-              list.map(({id, action, title}: {id: string; action: string; title: string}) => <Menu key={id} action={action} title={title} />)}
-          </Box>
+        <Box
+          component="nav"
+          aria-label="카테고리"
+          sx={{
+            display: "flex",
+            overflowX: "auto",
+            gap: 1,
+            padding: "0 12px 10px",
+          }}>
+          {list.map(({id, action, title}: {id: string; action: string; title: string}) => (
+            <Box
+              key={id}
+              component={Link}
+              to={action}
+              sx={{
+                flex: "0 0 auto",
+                backgroundColor: kraft.sticker,
+                padding: "6px 12px",
+                fontWeight: 700,
+                fontSize: 13,
+                boxShadow: "2px 3px 0 rgba(26, 18, 11, 0.35)",
+              }}>
+              {title}
+            </Box>
+          ))}
         </Box>
       </Box>
       <Outlet />
     </>
-  );
-}
-function Menu({action, title}: {action: string; title: string}) {
-  return (
-    <Box component={"li"}>
-      <Link to={action}>{title}</Link>
-    </Box>
   );
 }

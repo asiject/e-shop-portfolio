@@ -1,6 +1,5 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import axios from "axios";
 import {useRecoilValue} from "recoil";
 
 import {Box, Button} from "@mui/material";
@@ -11,8 +10,8 @@ import {execute} from "@utils/Executor";
 import {numberFormat} from "@utils/Numaric";
 import Options from "./Options";
 import Item from "./Item";
-import Package from "./Package";
 import {api} from "@recoils/common";
+import {kraft, lotLabel} from "theme/kraft";
 
 export default function ProductDetail({
   product,
@@ -24,26 +23,47 @@ export default function ProductDetail({
   setSelectList,
   packageMethod,
   setPackageMethod,
-  totalCost,
-  setTotalCost,
-  totalStock,
-  setTotalStock,
   tabYn,
 }: any) {
   const navigate = useNavigate();
   const [selectFair, setSelectFair] = useState([]);
   const user = useRecoilValue(userState);
-
   const styles = Styles();
-  const handleAddCart = async (product: any) => {
+
+  const totalStock =
+    selectList.length > 0 ? selectList.reduce((sum: number, item: any) => sum + item.stock, 0) : optLen > 0 ? 0 : product.stock || 1;
+  const totalCost =
+    selectList.length > 0
+      ? selectList.reduce((sum: number, item: any) => sum + item.cost * item.stock, 0)
+      : optLen > 0
+        ? 0
+        : product.cost * (product.stock || 1);
+
+  const requireLogin = () => {
+    if (user) return true;
+    if (confirm("로그인 후 이용이 가능합니다.\n로그인하시겠습니까?")) {
+      navigate("/login");
+    }
+    return false;
+  };
+
+  const requireOption = () => {
+    if (optLen > 0 && selectList.length === 0) {
+      alert("옵션을 선택하세요");
+      return false;
+    }
+    return true;
+  };
+
+  const handleAddCart = async (payload: any) => {
     await execute(async () => {
-      const {data} = await api.post(`/cart/`, product);
-      // console.log("handleAddCart : ", data);
+      await api.post(`/cart/`, payload);
       if (confirm("장바구니에 상품을 담았습니다.\n장바구니로 이동하시겠습니까?")) {
         navigate("/cart/list");
       }
     });
   };
+
   const handleTakeOrdered = async (params: any) => {
     await execute(async () => {
       const {data} = await api.post(`/user/${user.userid}/order/`, params);
@@ -51,40 +71,105 @@ export default function ProductDetail({
     });
   };
 
+  const handleBuy = () => {
+    if (!requireLogin() || !requireOption()) return;
+    const params =
+      optLen > 0
+        ? {
+            user: user.userid,
+            status: "TEMP",
+            products: selectList.map((item: any) => ({
+              productid: product.id,
+              itemid: item.itemid,
+              option: item.val,
+              count: item.stock,
+              cost: item.cost,
+            })),
+          }
+        : {
+            user: user.userid,
+            status: "TEMP",
+            products: [
+              {
+                productid: product.id,
+                itemid: 0,
+                option: "",
+                count: product.stock,
+                cost: product.cost,
+              },
+            ],
+          };
+    handleTakeOrdered(params);
+  };
+
+  const handleCart = async () => {
+    if (!requireLogin() || !requireOption()) return;
+    if (optLen > 0) {
+      await Promise.all(
+        selectList.map((item: any) =>
+          handleAddCart({
+            userid: user.userid,
+            productid: product.id,
+            pid: product.id,
+            itemid: item.itemid,
+            option: item.val,
+            count: item.stock,
+            cost: item.cost,
+          }),
+        ),
+      );
+      return;
+    }
+    await handleAddCart({
+      userid: user.userid,
+      productid: product.id,
+      pid: product.id,
+      itemid: 0,
+      option: "",
+      count: product.stock,
+      cost: product.cost,
+    });
+  };
+
   return (
     <Box sx={tabYn ? styles.tabProduct : styles.productRight}>
       <Box sx={styles.productInfoArea}>
         <Box sx={tabYn ? styles.none : {}}>
-          <Box>
-            <Box component="strong">{product.title}</Box>
+          <Box
+            sx={{
+              fontFamily: kraft.mono,
+              fontSize: 11,
+              fontWeight: 600,
+              letterSpacing: "0.08em",
+            }}>
+            {lotLabel(product.id)}
           </Box>
-          <Box sx={styles.productPrice}>
-            {/* TODO: 할인율 생성 / 적용 */}
-            {/* <Box sx={{ color: "#6b90dc", fontSize: "30px" }}>30%</Box> */}
-            <Box>
-              <Box>
-                <Box component={"strong"}>{numberFormat(product.cost)}</Box>
-              </Box>
-            </Box>
+          <Box
+            component="h1"
+            sx={{
+              m: "8px 0 0",
+              fontFamily: kraft.display,
+              fontSize: 22,
+              fontWeight: 700,
+              letterSpacing: "-0.03em",
+              lineHeight: 1.25,
+            }}>
+            {product.title}
           </Box>
-        </Box>
-        <Box>
-          {/* TODO: 배송 방식을 주문할 때 정하는 게 낫지 않을까?
-          장바구니 담을 때 정하려면 Cart DB에 delviery 방식에 대한 column 추가가 필요함 */}
-          {/* 고민해봤을 때, 장바구니에 담을 때보다 주문할 때 배송지 적거나 직접수령으로 선택해서 결제하는 게 나을듯, 어차피 카드 계산 같은 거 안하니까. */}
-          {/* <Package packageMethod={packageMethod} setPackageMethod={setPackageMethod} /> */}
+          {product.description && (
+            <Box sx={{mt: 1, color: kraft.mute, fontSize: 14, lineHeight: 1.45}}>{product.description}</Box>
+          )}
+          <Box sx={styles.productPrice}>{numberFormat(product.cost)}</Box>
         </Box>
       </Box>
       <Box sx={optLen > 0 ? styles.optionArea : styles.noneOption}>
         {optionKeys &&
           optionKeys.map((optkey: any, i: number) => {
             const opt = optionList.filter((opt: any) => opt.key == optkey);
-            // console.log("opt >>>", opt);
             const optval = opt[0].val.split(",");
             return (
-              <Box key={i}>
+              <Box key={optkey}>
                 <Options
-                  key={i}
                   seq={i + 1}
                   optLen={optLen}
                   optkey={optkey}
@@ -94,139 +179,41 @@ export default function ProductDetail({
                   setSelectFair={setSelectFair}
                   selectList={selectList}
                   setSelectList={setSelectList}
-                  totalCost={totalCost}
-                  setTotalCost={setTotalCost}
-                  totalStock={totalStock}
-                  setTotalStock={setTotalStock}
                 />
               </Box>
             );
           })}
       </Box>
       <Box sx={styles.totalInfoArea}>
-        <Box component={"ul"}>
+        <Box component={"ul"} sx={{m: 0, p: 0, listStyle: "none"}}>
           {selectList && optLen > 0 && optionKeys.length > 0 ? (
             selectList.map((selectItem: any, i: number) => {
               const itemInfo = itemList.filter((item: any) => item.val == selectItem.val)[0];
               return (
                 <Item
-                  key={i}
+                  key={selectItem.itemid ?? selectItem.val}
                   seq={i}
                   optLen={optLen}
                   itemInfo={itemInfo}
                   selectList={selectList}
                   setSelectList={setSelectList}
-                  totalCost={totalCost}
-                  setTotalCost={setTotalCost}
-                  totalStock={totalStock}
-                  setTotalStock={setTotalStock}
                 />
               );
             })
           ) : (
-            <Item
-              seq={0}
-              optLen={optLen}
-              itemInfo={product}
-              selectList={selectList}
-              setSelectList={setSelectList}
-              totalCost={totalCost}
-              setTotalCost={setTotalCost}
-              totalStock={totalStock}
-              setTotalStock={setTotalStock}
-            />
+            <Item seq={0} optLen={optLen} itemInfo={product} selectList={selectList} setSelectList={setSelectList} />
           )}
         </Box>
         <Box sx={styles.productTotalValues}>
-          <Box sx={styles.productStock}>
-            <Box>
-              <Box component={"span"}>총 수량 {totalStock}개</Box>
-            </Box>
-          </Box>
-          <Box sx={styles.productCost}>
-            <Box component={"strong"}>{numberFormat(totalCost)}</Box>
-          </Box>
+          <Box sx={styles.productStock}>총 {totalStock}개</Box>
+          <Box sx={styles.productCost}>{numberFormat(totalCost)}</Box>
         </Box>
         <Box sx={styles.productBtnArea}>
-          <Button variant="contained" sx={styles.productOrderBtn} size="large">
-            <Box
-              onClick={() => {
-                if (user) {
-                  // console.log("selectList check ? >>> ", selectList);
-                  let params =
-                    optLen > 0
-                      ? {
-                          user: user.userid,
-                          status: "TEMP",
-                          products: selectList.map((item: any) => ({
-                            productid: product.id,
-                            itemid: item.itemid,
-                            option: item.val,
-                            count: item.stock,
-                            cost: item.cost,
-                          })),
-                        }
-                      : {
-                          user: user.userid,
-                          status: "TEMP",
-                          products: [
-                            {
-                              productid: product.id,
-                              itemid: 0,
-                              option: "",
-                              count: product.stock,
-                              cost: product.cost,
-                            },
-                          ],
-                        };
-                  handleTakeOrdered(params);
-                } else if (confirm("로그인 후 이용이 가능합니다.\n로그인하시겠습니까?")) {
-                  navigate("/login");
-                }
-              }}>
-              구매하기
-            </Box>
+          <Button variant="contained" sx={styles.productOrderBtn} size="large" onClick={handleBuy}>
+            구매하기
           </Button>
-          <Button variant="outlined" sx={styles.productCartBtn} size="large">
-            <Box
-              onClick={() => {
-                if (user) {
-                  let data = {};
-                  if (optLen > 0) {
-                    // console.log("장바구니 옵션 있음 : ", product, selectList);
-                    selectList.map(async (item: any) => {
-                      data = {
-                        userid: user.userid,
-                        productid: product.id,
-                        pid: product.id,
-                        itemid: item.itemid,
-                        option: item.val,
-                        count: item.stock,
-                        cost: item.cost,
-                      };
-                      await handleAddCart(data);
-                    });
-                  } else {
-                    // console.log("장바구니 옵션 없음 : ", product);
-                    data = {
-                      userid: user.userid,
-                      productid: product.id,
-                      pid: product.id,
-                      itemid: 0,
-                      option: "",
-                      count: product.stock,
-                      cost: product.cost,
-                    };
-                    handleAddCart(data);
-                    // userid, productid, itemid, option(itemval), count, cost
-                    // EX) "abc@gmail.com", 1, 0, "", 1, "8000"
-                  }
-                } else if (confirm("로그인 후 이용이 가능합니다.\n로그인하시겠습니까?")) {
-                  navigate("/login");
-                }
-              }}>
-              장바구니
-            </Box>
+          <Button variant="outlined" sx={styles.productCartBtn} size="large" onClick={handleCart}>
+            장바구니
           </Button>
         </Box>
       </Box>

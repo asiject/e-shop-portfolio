@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import Loading from "@layout/Loading";
 import Error from "@layout/Error";
-import {getAdminRoleUserListQuery} from "@recoils/admin/role/query";
+import {useAdminRoleUserListQuery} from "@recoils/admin/role/query";
 import {AppBar, Box, IconButton, Toolbar, Tooltip} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -15,7 +15,7 @@ export default function AdminRoleList() {
   const [selected, setSelected]: any = useState([]);
   const [open, setOpen] = useState(false);
   const [list, setList]: any = useState([]);
-  const {isLoading, isError, data, error} = getAdminRoleUserListQuery();
+  const {isLoading, isError, data, error} = useAdminRoleUserListQuery();
   useEffect(() => {
     if (data) {
       setList(data);
@@ -27,24 +27,16 @@ export default function AdminRoleList() {
   if (isError) {
     return <Error error={error} />;
   }
-  console.log("data >", data);
   const handleAddItems = async (items: any) => {
     const uids = items?.map((user: any) => user?.userid);
-    console.log("uids >", uids, {uids});
     await postAdminRoleUser(roleid, {uids});
     setList(items);
   };
 
   const handleRemoveItems = async () => {
-    let removeItems = list;
-    for (const obj of selected) {
-      await deleteAdminRoleUser(roleid, obj?.userid);
-      const idx = removeItems?.findIndex((item: any) => item?.userid == obj?.userid);
-      if (idx > -1) {
-        removeItems = [...removeItems.slice(0, idx), ...removeItems.slice(idx + 1, list?.length)];
-      }
-    }
-    setList([...removeItems]);
+    await Promise.all(selected.map((obj: any) => deleteAdminRoleUser(roleid, obj?.userid)));
+    const selectedIds = new Set(selected.map((obj: any) => obj?.userid));
+    setList(list.filter((item: any) => !selectedIds.has(item?.userid)));
     setSelected([]);
   };
 
@@ -58,14 +50,14 @@ function RightButtons({selected, setOpen, handleRemoveItems}: any) {
   const buttonList = [
     selected?.length == 0 && (
       <Tooltip key={"add"} title="추가">
-        <IconButton edge="end" sx={{color: "white"}} onClick={() => setOpen(true)}>
+        <IconButton edge="end" sx={{color: "inherit"}} onClick={() => setOpen(true)}>
           <AddIcon />
         </IconButton>
       </Tooltip>
     ),
     selected?.length > 0 && (
       <Tooltip key={"del"} title="삭제">
-        <IconButton edge="end" sx={{color: "white"}} onClick={handleRemoveItems}>
+        <IconButton edge="end" sx={{color: "inherit"}} onClick={handleRemoveItems}>
           <RemoveIcon />
         </IconButton>
       </Tooltip>

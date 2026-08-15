@@ -34,8 +34,8 @@ export default function RecentDelivery({open, setOpen, deliveryList, setDelivery
             </TableHead>
             <TableBody>
               {deliveryList &&
-                deliveryList?.map((delivery: any, index: number) => {
-                  return <DestinationList key={index} delivery={delivery} setDeliveryFromList={setDeliveryFromList} setOpen={setOpen} />;
+                deliveryList?.map((delivery: any) => {
+                  return <DestinationList key={delivery.id} delivery={delivery} setDeliveryFromList={setDeliveryFromList} setOpen={setOpen} />;
                 })}
             </TableBody>
           </Table>

@@ -1,6 +1,9 @@
 export default function statusCheck(status: string) {
   let statement = "";
   switch (status) {
+    case "TEMP":
+      statement = "주문서 작성중";
+      break;
     case "WAIT":
       statement = "입금대기";
       break;

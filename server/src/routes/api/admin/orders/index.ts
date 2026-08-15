@@ -27,14 +27,12 @@ export default async function (fastify: FastifyInstance) {
     reply.send(orders);
   });
   fastify.get("/shipment", async (req: FastifyRequest, reply: FastifyReply) => {
-    console.log("shipment >>");
     const orders: Orders[] = await getOrdersByShipment();
     reply.send(orders);
   });
 
   fastify.put("/status", async (req: FastifyRequest<{Body: {ids: string[]; status: string}}>, reply: FastifyReply) => {
     const {ids, status} = req.body;
-    console.log("put ids, status >>", ids, status, req.body);
     const result = await editOrdersStatus(ids, status);
     reply.send(result);
   });

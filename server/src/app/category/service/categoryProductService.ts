@@ -26,7 +26,6 @@ export async function addBatchCategoryProduct(categoryid: number, pids: number[]
 
     const existsData = await repository.find({where: {categoryid, productid: In(pids)}});
     const products = pids.filter(pid => existsData?.filter(cp => cp.productid != pid))?.map(productid => ({categoryid, productid}));
-    console.log("products >", products);
     const result = await repository.save(products);
     return result;
   });

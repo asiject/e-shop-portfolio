@@ -10,30 +10,29 @@ import AddIcon from "@mui/icons-material/Add";
 
 import {Styles} from "@styles";
 import {userState} from "@recoils/user/state";
-import {getOrderListQuery} from "@recoils/order/query";
+import {useOrderListQuery} from "@recoils/order/query";
 import {numberFormat} from "@utils/Numaric";
 import {execute} from "@utils/Executor";
 import dateFormat from "@utils/DateFormat";
 import statusCheck from "@utils/StatusCheck";
 import Loading from "@layout/Loading";
 import Error from "@layout/Error";
-import {User} from "@utils/Types";
+import {shopProductQnaHref} from "@utils/productQna";
 
 export default function OrderList() {
   const [orderList, setOrderList] = useState<Array<any>>([]);
   const loginUser = useRecoilValue(userState);
   const navigate = useNavigate();
   const styles = Styles();
-  const {isLoading, isError, data, error} = getOrderListQuery({userid: loginUser?.userid});
+  const {isLoading, isError, data, error} = useOrderListQuery({userid: loginUser?.userid});
 
-  console.log("data >", data);
   useEffect(() => {
     if (loginUser) {
       setOrderList(data);
     } else {
       navigate("/login");
     }
-  }, [data]);
+  }, [data, loginUser, navigate]);
 
   if (isLoading) {
     return <Loading />;
@@ -52,7 +51,7 @@ export default function OrderList() {
               sx={{width: "100%"}}
               size="small"
               InputProps={{
-                endAdornment: <SearchIcon sx={{cursor: "pointer", color: "#9ac66d"}} />,
+                endAdornment: <SearchIcon sx={{cursor: "pointer", color: "#1A120B"}} />,
               }}
             />
           </Box>
@@ -62,8 +61,8 @@ export default function OrderList() {
             </Button>
           </Box>
         </Box>
-        {orderList?.map((list, index) => {
-          return <OrderedList key={index} list={list} />;
+        {orderList?.map(list => {
+          return <OrderedList key={list.orderid} list={list} />;
         })}
         <Box
           sx={{
@@ -143,8 +142,8 @@ function OrderedList({list}: {list: any}) {
             {status}
           </Box>
           {list &&
-            list.products.map((item: any, index: number) => {
-              return <ListItem key={index} item={item} />;
+            list.products.map((item: any) => {
+              return <ListItem key={`${item.productid}-${item.itemid}`} item={item} />;
             })}
         </Box>
         <Box
@@ -191,10 +190,14 @@ function OrderedList({list}: {list: any}) {
               size="small"
               sx={{width: "100%", height: "38px", color: "#AAA"}}
               onClick={() => {
-                console.log("교환 반품 신청");
+                const first = list.products?.[0];
+                if (!first?.productid) {
+                  alert("상품 정보를 찾을 수 없습니다");
+                  return;
+                }
+                navigate(shopProductQnaHref(first.productid, {kind: "return", orderid: String(list.orderid)}));
               }}>
-              {/* TODO: 교환 반품 신청 */}
-              교환, 반품 신청
+              교환, 반품 문의
             </Button>
           </Box>
         </Box>
@@ -204,7 +207,6 @@ function OrderedList({list}: {list: any}) {
 }
 
 function ListItem({item}: {item: any}) {
-  console.log("item >", item);
   return (
     <Box sx={{display: "flex", marginTop: "20px"}}>
       <Box sx={{margin: "20px 20px 20px 0"}}>

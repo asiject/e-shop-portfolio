@@ -1,82 +1,72 @@
 import React, {useEffect, useState, useRef} from "react";
-import {Navigate, useNavigate, useParams} from "react-router-dom";
-// import {Carousel} from "react-carousel-minimal";
-import {Carousel} from "@sefailyasoz/react-carousel";
-import {useRecoilState} from "recoil";
-
+import {useNavigate, useParams} from "react-router-dom";
 import {Box, Button} from "@mui/material";
 
-import {getProductQuery} from "@recoils/product/query";
+import {useProductQuery} from "@recoils/product/query";
 import {Styles} from "@styles";
 import ContentMenubar from "./ContentMenubar";
-import Qna from "./Qna";
-import TakeBack from "./TakeBack";
 import ProductDetail from "./ProductDetail";
-import {ProductsProduct, ThumbnailImage, OrderedProduct} from "@utils/Types";
+import {ProductsProduct, OrderedProduct} from "@utils/Types";
 import Loading from "@layout/Loading";
 import Error from "@layout/Error";
+import NoImage from "components/shop/NoImage";
+import ProductImages, {collectProductImages} from "components/shop/ProductImages";
+import ProductEditorBody from "components/shop/ProductEditorBody";
+import ProductQna from "components/shop/ProductQna";
+import ProductTakeBack from "components/shop/ProductTakeBack";
 import {numberFormat} from "@utils/Numaric";
+import {kraft, lotLabel} from "theme/kraft";
 
 export default function Product() {
   const [product, setProduct] = useState<ProductsProduct>();
+  const [editor, setEditor] = useState("");
   const {productid} = useParams();
-  const [imageList, setImageList] = useState<Array<ThumbnailImage>>([]);
+  const [imageList, setImageList] = useState<string[]>([]);
   const [optionList, setOptionList] = useState<Array<any>>([]);
   const [itemList, setItemList] = useState<Array<OrderedProduct>>([]);
   const [optionKeys, setOptionKeys] = useState<Array<string>>([]);
   const [optLen, setOptLen] = useState(0);
   const [selectList, setSelectList] = useState([]);
   const [packageMethod, setPackageMethod] = useState("");
-  const [totalStock, setTotalStock] = useState(0);
-  const [totalCost, setTotalCost] = useState(0);
-  const productTabContainer = useRef<HTMLElement>();
-  const detailPage = useRef<HTMLElement>();
-  const showEasyToBuy = useRef<HTMLElement>();
-  const openBtn = useRef<HTMLElement>();
-  const closeBtn = useRef<HTMLElement>();
+  const [isSticky, setIsSticky] = useState(false);
+  const [isBuyOpen, setIsBuyOpen] = useState(false);
+  const detailPage = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const styles = Styles();
 
-  const {isLoading, isError, data, error} = getProductQuery(productid || "", {
+  const {isLoading, isError, data, error} = useProductQuery(productid || "", {
     retry: 0,
     refetchOnWindowFocus: false,
     onSuccess: async (result: any) => {
-      //api 호출 성공
       if (result?.data == null) {
         alert("데이터가 없습니다.");
         navigate("/");
-      } else {
-        await productFunc(result?.data);
+        return;
       }
+      await productFunc(result?.data);
     },
     onError: () => {},
   });
 
-  const tabInit = () => {
-    showEasyToBuy.current!.style.display = "none";
-    closeBtn.current!.style.display = "none";
-    openBtn.current!.style.display = "block";
-  };
-  window.addEventListener("scroll", e => {
-    const value = window.scrollY;
-    if (detailPage.current != null) {
-      const boxTop = detailPage.current.offsetTop;
-      if (value > boxTop) {
-        productTabContainer.current!.style.display = "flex";
-      } else if (value <= boxTop) {
-        productTabContainer.current!.style.display = "none";
-        tabInit();
-      }
-    }
-  });
+  useEffect(() => {
+    const onScroll = () => {
+      const top = detailPage.current?.offsetTop ?? 0;
+      const next = window.scrollY > top;
+      setIsSticky(next);
+      if (!next) setIsBuyOpen(false);
+    };
+    window.addEventListener("scroll", onScroll, {passive: true});
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   if (isLoading) {
     return <Loading />;
   }
   if (isError) {
     return <Error error={error} />;
   }
+
   async function productFunc(data: any) {
-    // console.log("result : ", result);
     setProduct({
       id: data?.id,
       title: data?.title,
@@ -88,150 +78,92 @@ export default function Product() {
       showyn: data?.showyn,
       stock: 1,
     });
-    if (data?.thumbnail) {
-      let thumbImage: ThumbnailImage = {image: ""};
-      let imagePaths: Array<ThumbnailImage> = [];
-      if (data?.thumbnail) {
-        let host = window.location.protocol + "//" + window.location.hostname;
-        if (window.location.port) {
-          host += ":" + window.location.port;
-        }
-        host += data.thumbnail;
-        thumbImage = {image: host};
-      }
-      if (data.images) {
-        imagePaths = [
-          ...new Set<ThumbnailImage>(
-            data.images.map(({path}: any) => {
-              return {image: path};
-            }),
-          ),
-        ];
-      }
-      imagePaths.length > 0 ? setImageList([thumbImage, ...imagePaths]) : setImageList([thumbImage]);
-      // product optionCnt가 1(개)이상일 경우
-      if (data.optionCnt > 0) {
-        setOptLen(Number(data.optionCnt));
-        setOptionKeys([...new Set<string>(data.options.map((r: any) => r.optkey))]);
-        let options = data.options?.map((option: any) => {
-          return {
-            key: option.optkey,
-            val: option.optvals,
-          };
-        });
-        //FIXME: ?? 왜 0번 idx 고정임?
-        let items = data?.options[0]?.items?.map((item: any) => {
-          return {
-            itemid: item.itemid,
-            key: item.itemkey,
-            val: item.itemval,
-            itemkey: item.itemkey.split(",")[0],
-            itemval: item.itemkey.split(",")[1],
-            cost: Number(data.cost) + Number(item.price),
-            price: Number(item.price),
-            capacity: Number(item.capacity),
-            stock: 1,
-          };
-        });
-        setOptionList(
-          [...new Set<any>(options.map(JSON.stringify))].map((item: any) => {
+    setEditor(data?.editor || "");
+    setImageList(collectProductImages(data));
+    if (data.optionCnt > 0) {
+      setOptLen(Number(data.optionCnt));
+      setOptionKeys([...new Set<string>(data.options.map((r: any) => r.optkey))]);
+      let options = data.options?.map((option: any) => {
+        return {
+          key: option.optkey,
+          val: option.optvals,
+        };
+      });
+      let items = data?.options[0]?.items?.map((item: any) => {
+        return {
+          itemid: item.itemid,
+          key: item.itemkey,
+          val: item.itemval,
+          itemkey: item.itemkey.split(",")[0],
+          itemval: item.itemkey.split(",")[1],
+          cost: Number(data.cost) + Number(item.price),
+          price: Number(item.price),
+          capacity: Number(item.capacity),
+          stock: 1,
+        };
+      });
+      setOptionList(
+        [...new Set<any>(options.map(JSON.stringify))].map((item: any) => {
+          return JSON.parse(item);
+        }),
+      );
+      if (items) {
+        setItemList(
+          [...new Set<OrderedProduct>(items?.map(JSON.stringify))].map((item: any) => {
             return JSON.parse(item);
           }),
         );
-        if (items) {
-          setItemList(
-            [...new Set<OrderedProduct>(items?.map(JSON.stringify))].map((item: any) => {
-              return JSON.parse(item);
-            }),
-          );
-        }
       }
     }
     window.scrollTo(0, 0);
   }
 
+  const buyPanel = product && (
+    <ProductDetail
+      product={product}
+      optLen={optLen}
+      optionKeys={optionKeys}
+      optionList={optionList}
+      itemList={itemList}
+      selectList={selectList}
+      setSelectList={setSelectList}
+      packageMethod={packageMethod}
+      setPackageMethod={setPackageMethod}
+      tabYn={false}
+    />
+  );
+
   return (
     <Box sx={styles.container}>
       <Box sx={styles.productBox}>
         <Box sx={styles.productLeft}>
-          {imageList.length > 0 ? (
-            <Carousel
-              data={imageList}
-              animationDuration={5000}
-              // captionPosition="bottom"
-              // automatic={true}
-              // pauseIconColor="white"
-              // pauseIconSize="40px"
-              // slideImageFit="cover"
-              // thumbnails={true}
-              // thumbnailWidth="100px"
-            />
-          ) : (
-            <Box />
-          )}
+          <ProductImages images={imageList} alt={product?.title || "상품"} />
         </Box>
-        {product && (
-          <ProductDetail
-            product={product}
-            optLen={optLen}
-            optionKeys={optionKeys}
-            optionList={optionList}
-            itemList={itemList}
-            selectList={selectList}
-            setSelectList={setSelectList}
-            packageMethod={packageMethod}
-            setPackageMethod={setPackageMethod}
-            totalCost={totalCost}
-            setTotalCost={setTotalCost}
-            totalStock={totalStock}
-            setTotalStock={setTotalStock}
-            tabYn={false}
-          />
-        )}
+        {buyPanel}
       </Box>
 
       <Box ref={detailPage}>
         <ContentMenubar />
-        <Box ref={productTabContainer} sx={styles.productTabContainer}>
-          <Box>
-            {/* FIXME: NoImage 처리 필요 */}
-            <Box sx={styles.tabThumbnail}>{product?.thumbnail && <Box component={"img"} src={`${product?.thumbnail}`} />}</Box>
-            <Box sx={styles.tabInfo}>
-              <Box>
-                <strong>{product?.title}</strong>
+        {isSticky && (
+          <Box sx={styles.productTabContainer}>
+            <Box>
+              <Box sx={styles.tabThumbnail}>
+                {product?.thumbnail ? <Box component={"img"} src={`${product.thumbnail}`} alt="" /> : <NoImage size="thumb" />}
               </Box>
-              <Box>
-                <strong>{numberFormat(product?.cost || 0)}</strong>
+              <Box sx={styles.tabInfo}>
+                <Box>{product?.title}</Box>
+                <Box>{numberFormat(product?.cost || 0)}</Box>
               </Box>
-            </Box>
-            <Box sx={styles.tabOpen}>
-              <Box ref={openBtn}>
+              <Box sx={styles.tabOpen}>
                 <Button
-                  variant="outlined"
-                  onClick={() => {
-                    showEasyToBuy.current!.style.display = "block";
-                    closeBtn.current!.style.display = "block";
-                    openBtn.current!.style.display = "none";
-                  }}>
-                  구매하기
-                </Button>
-              </Box>
-              <Box ref={closeBtn}>
-                <Button
-                  variant="outlined"
-                  sx={{display: "none"}}
-                  onClick={() => {
-                    showEasyToBuy.current!.style.display = "none";
-                    closeBtn.current!.style.display = "none";
-                    openBtn.current!.style.display = "block";
-                  }}>
-                  X
+                  variant={isBuyOpen ? "contained" : "outlined"}
+                  onClick={() => setIsBuyOpen(open => !open)}
+                  aria-expanded={isBuyOpen}>
+                  {isBuyOpen ? "닫기" : "구매하기"}
                 </Button>
               </Box>
             </Box>
-          </Box>
-          <Box ref={showEasyToBuy} sx={{display: "none"}}>
-            {product && (
+            {isBuyOpen && product && (
               <ProductDetail
                 product={product}
                 optLen={optLen}
@@ -242,23 +174,36 @@ export default function Product() {
                 setSelectList={setSelectList}
                 packageMethod={packageMethod}
                 setPackageMethod={setPackageMethod}
-                totalCost={totalCost}
-                setTotalCost={setTotalCost}
-                totalStock={totalStock}
-                setTotalStock={setTotalStock}
                 tabYn={"Y"}
               />
             )}
+            <ContentMenubar />
           </Box>
-          <ContentMenubar />
-        </Box>
-        <Box sx={styles.w100per}>
-          {/* TODO: 아래 스타일은 지워질 정보 */}
-          <Box id="info" sx={{height: "600px"}}>
-            상품페이지
+        )}
+        <Box sx={{...styles.w100per, display: "flex", flexDirection: "column", gap: "28px", mt: "28px"}}>
+          <Box
+            id="info"
+            sx={{
+              backgroundColor: kraft.sticker,
+              border: `2px solid ${kraft.ink}`,
+              padding: "28px 24px",
+            }}>
+            <Box
+              component="h2"
+              sx={{
+                m: 0,
+                mb: 2,
+                fontFamily: kraft.display,
+                fontSize: 22,
+                fontWeight: 700,
+                letterSpacing: "-0.03em",
+              }}>
+              {product ? lotLabel(product.id) : "상세 정보"}
+            </Box>
+            <ProductEditorBody html={editor} />
           </Box>
-          <Qna id="qna" />
-          <TakeBack id="takeback" />
+          <ProductQna id="qna" productId={product?.id} />
+          <ProductTakeBack id="takeback" />
         </Box>
       </Box>
     </Box>

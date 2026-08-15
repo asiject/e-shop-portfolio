@@ -79,3 +79,20 @@ export type DeleveryData = {
   address1: string;
   address2: string;
 };
+
+export type OrderLine = {
+  productid: number;
+  itemid: number;
+  option?: string;
+  count?: number;
+  cost?: number;
+  title?: string;
+  thumbnail?: string;
+};
+
+export type OrderListRow = {
+  orderid: string;
+  status?: string;
+  createdate?: string;
+  products?: OrderLine[];
+};

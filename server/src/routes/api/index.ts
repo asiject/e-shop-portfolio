@@ -22,7 +22,6 @@ export default async function (fastify: FastifyInstance) {
   fastify.register(admin, {prefix: "/admin"});
 
   fastify.post("/refreshToken", async (req: FastifyRequest<{Body: {refresh_token: string}}>, reply: FastifyReply) => {
-    console.log("refreshToken >");
     reply.send("refreshToken");
   });
   //FIXME: 기존 소스 임
@@ -31,13 +30,11 @@ export default async function (fastify: FastifyInstance) {
     url: "/login",
     handler: async (req: FastifyRequest<{Body: {email: string; username: string; refresh_token: string}}>, reply: FastifyReply) => {
       const {email, username, refresh_token} = req.body;
-      console.log("refresh_token >>", email, username, refresh_token);
       const users = await UserLogin.findOne({where: {email}, relations: {user: true}});
       const user = users?.user;
       if (user) {
         const adminRole = user?.roles?.find(({role}) => role.roleid == "ADMIN");
         user.isAdmin = adminRole ? true : false;
-        console.log("data >", adminRole);
         reply.send(user);
       } else {
         //회원가입 페이지로 이동?

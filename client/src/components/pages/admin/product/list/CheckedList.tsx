@@ -26,13 +26,11 @@ function Items({list, selected, handleItem}: any) {
     return <NoData />;
   }
   const handleView = (id: number) => {
-    console.log("handleView >");
     navigate(id);
   };
 
   const handleChecked = (e: any, item: any) => {
     handleItem(item);
-    console.log("handleChecked >", item);
     e.stopPropagation();
   };
 

@@ -1,9 +1,8 @@
-// cart 관계....
 import Product from "@product/entity/Product";
-import {Entity, Column, BaseEntity, OneToMany, JoinColumn, PrimaryGeneratedColumn, Unique, Index, ManyToOne} from "typeorm";
+import {Entity, Column, BaseEntity, JoinColumn, PrimaryGeneratedColumn, Unique, ManyToOne} from "typeorm";
+
 @Entity()
-//FIXME: 이거는 실제로 해봐야 정확해 질 듯?
-// @Index(["userid", "pid", "itemid", "option"], {unique: true})
+@Unique(["userid", "pid", "itemid", "option"])
 export default class Cart extends BaseEntity {
   @PrimaryGeneratedColumn({type: "bigint"})
   id: number;
@@ -11,14 +10,13 @@ export default class Cart extends BaseEntity {
   @Column({length: 100})
   userid: string;
 
-  //productid
   @Column({type: "bigint"})
   pid: number;
 
   @Column({type: "bigint"})
   itemid: number;
 
-  @Column()
+  @Column({default: ""})
   option: string;
 
   @Column({type: "bigint"})
