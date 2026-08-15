@@ -27,10 +27,7 @@ export default function Main() {
         {isLoading ? (
           <ProductListSkeleton count={SKELETON_COUNT} variant="web" />
         ) : isEmpty ? (
-          <>
-            <ProductListSkeleton count={SKELETON_COUNT} variant="web" />
-            <NoData />
-          </>
+          <NoData />
         ) : (
           <Box component={"ul"} sx={styles.newGoods}>
             {data.map((item: any) => {

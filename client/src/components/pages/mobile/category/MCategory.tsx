@@ -58,10 +58,7 @@ export default function MCategory() {
       {isLoading ? (
         <ProductListSkeleton count={SKELETON_COUNT} variant="mobile" />
       ) : isEmpty ? (
-        <>
-          <ProductListSkeleton count={SKELETON_COUNT} variant="mobile" />
-          <NoData />
-        </>
+        <NoData />
       ) : (
         <>
           <GalleryView list={list} />

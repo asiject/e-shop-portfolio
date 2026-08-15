@@ -47,10 +47,7 @@ export default function MMain() {
         {isLoading ? (
           <ProductListSkeleton count={SKELETON_COUNT} variant="mobile" />
         ) : isEmpty ? (
-          <>
-            <ProductListSkeleton count={SKELETON_COUNT} variant="mobile" />
-            <NoData />
-          </>
+          <NoData />
         ) : (
           <Box component={"ul"} sx={MStyles.cardList}>
             {list.map((item: any) => {

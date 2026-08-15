@@ -33,10 +33,7 @@ export default function Category() {
       {isLoading ? (
         <ProductListSkeleton count={SKELETON_COUNT} variant="web" />
       ) : isEmpty ? (
-        <>
-          <ProductListSkeleton count={SKELETON_COUNT} variant="web" />
-          <NoData />
-        </>
+        <NoData />
       ) : (
         <ContentArea listView={listView} data={data} />
       )}
